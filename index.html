@@ -213,7 +213,7 @@
             transform: scale(0.98);
         }
         .coupon-banner-text { 
-            font-size: 13px; font-weight: 600; text-align: left;
+            font-size: 13px; font-weight: 600; text-align: center; /* Alinhamento centralizado adicionado aqui */
             line-height: 1.4; flex-grow: 1; 
         }
         .coupon-code-wrapper {
@@ -1319,7 +1319,7 @@
 
             initCarousel();
 
-            // Renderizar Banner de Cupom (Ajustado)
+            // Renderizar Banner de Cupom
             const couponContainer = document.getElementById('coupon-banner-container');
             couponContainer.innerHTML = '';
             if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
