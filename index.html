@@ -185,6 +185,16 @@
         }
         .seller-crop-cancel { background: #e5e7eb; color: #111; }
         .seller-crop-save { background: var(--primary-color); color: white; }
+
+        .sync-status {
+            display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: #4b5563;
+            margin-bottom: 12px; padding: 6px 10px; border-radius: 999px; background: #f3f4f6; border: 1px solid #e5e7eb;
+        }
+        .sync-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;
+        }
+        .sync-dot.syncing { background: #f59e0b; }
+        .sync-dot.offline { background: #ef4444; }
     </style>
 </head>
 <body>
@@ -269,6 +279,11 @@
             <div class="admin-header">
                 <h2>⚙️ Painel Admin</h2>
                 <button class="btn-close" onclick="closeAdmin()">&times;</button>
+            </div>
+
+            <div class="sync-status" id="sync-status">
+                <span class="sync-dot" id="sync-dot"></span>
+                <span id="sync-status-text">Sincronizado</span>
             </div>
 
             <div class="admin-section">
@@ -407,6 +422,23 @@
             footerText: "© 2026 Center Sport - Todos os direitos reservados"
         };
 
+        function setSyncStatus(state, text = '') {
+            const dot = document.getElementById('sync-dot');
+            const statusText = document.getElementById('sync-status-text');
+            if (!dot || !statusText) return;
+
+            dot.classList.remove('syncing', 'offline');
+            if (state === 'syncing') {
+                dot.classList.add('syncing');
+                statusText.innerText = text || 'Sincronizando...';
+            } else if (state === 'offline') {
+                dot.classList.add('offline');
+                statusText.innerText = text || 'Offline';
+            } else {
+                statusText.innerText = text || 'Sincronizado';
+            }
+        }
+
         function showToast(message) {
             const toast = document.getElementById('custom-toast');
             document.getElementById('toast-msg').innerText = message;
@@ -537,6 +569,7 @@
 
         async function saveToSupabase(showAlert = true) {
             renderAdminView();
+            setSyncStatus('syncing', 'Sincronizando...');
             try {
                 const { error } = await supabaseClient
                     .from('linktree_settings')
@@ -549,11 +582,13 @@
                 localStorage.setItem(STORAGE_KEYS.cache, JSON.stringify(appData));
                 localStorage.setItem(STORAGE_KEYS.cacheTime, String(now));
                 localStorage.setItem(STORAGE_KEYS.forceRefresh, '1');
+                setSyncStatus('ok', 'Sincronizado');
 
                 if (showAlert) showToast('Salvo na nuvem com sucesso!');
 
                 window.dispatchEvent(new Event('center-sport-data-updated'));
             } catch (error) {
+                setSyncStatus('offline', 'Offline');
                 showToast("Erro ao salvar online.");
             }
         }
@@ -1145,16 +1180,26 @@
             });
         }
 
-        window.addEventListener('storage', (event) => {
-            if (event.key === STORAGE_KEYS.forceRefresh && event.newValue === '1') {
+        function setupAutoRefresh() {
+            window.addEventListener('storage', (event) => {
+                if (event.key === STORAGE_KEYS.forceRefresh && event.newValue === '1') {
+                    fetchAppData();
+                }
+            });
+
+            window.addEventListener('focus', () => {
+                const forceRefresh = localStorage.getItem(STORAGE_KEYS.forceRefresh) === '1';
+                if (forceRefresh) {
+                    fetchAppData();
+                }
+            });
+
+            window.addEventListener('center-sport-data-updated', () => {
                 fetchAppData();
-            }
-        });
+            });
+        }
 
-        window.addEventListener('center-sport-data-updated', () => {
-            fetchAppData();
-        });
-
+        setupAutoRefresh();
         window.onload = fetchAppData;
     </script>
 </body>
