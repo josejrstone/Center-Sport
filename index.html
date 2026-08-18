@@ -200,41 +200,42 @@
         .sync-dot.syncing { background: #f59e0b; }
         .sync-dot.offline { background: #ef4444; }
 
-        /* Cupom Banner Animado e Clicável */
+        /* Cupom Banner Animado e Clicável - Ajustado para layout lado a lado */
         .coupon-banner {
             position: relative; width: 100%;
-            padding: 14px 15px; text-align: center; margin-bottom: 15px;
+            padding: 14px 15px; margin-bottom: 15px;
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             cursor: pointer; transition: transform 0.1s ease;
             border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
         }
         .coupon-banner:active {
             transform: scale(0.98);
         }
-        .coupon-banner-title-inside {
-            font-size: 15px; font-weight: 700; 
-            white-space: nowrap; width: 100%; overflow: hidden; text-overflow: ellipsis;
-        }
-        .coupon-banner-content {
-            display: flex; align-items: center; justify-content: center; gap: 8px; 
-            width: 100%; white-space: nowrap; overflow: hidden;
-        }
         .coupon-banner-text { 
-            font-size: 14px; font-weight: 600; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            font-size: 13px; font-weight: 600; text-align: left;
+            line-height: 1.4; flex-grow: 1; 
+        }
+        .coupon-code-wrapper {
+            display: flex; flex-direction: column; align-items: stretch; justify-content: center;
+            flex-shrink: 0; min-width: 100px; max-width: 45%;
+        }
+        .coupon-banner-title-inside {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            text-align: center; margin-bottom: 4px; opacity: 0.9;
         }
         .coupon-banner-code {
-            padding: 5px 10px; border-radius: 6px; font-weight: 700;
-            font-size: 13px; letter-spacing: 1px; flex-shrink: 0;
-            white-space: nowrap;
+            padding: 6px 12px; border-radius: 6px; font-weight: 700;
+            font-size: 13px; letter-spacing: 1px; text-align: center;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- Toast de Notificação (Será usado para o cupom resgatado) -->
+        <!-- Toast de Notificação -->
         <div id="custom-toast"><i class="fas fa-info-circle"></i> <span id="toast-msg">Mensagem</span></div>
 
         <div id="custom-modal">
@@ -1326,10 +1327,10 @@
                 const headerColor = appData.colors.header || '#111111';
                 couponContainer.innerHTML = `
                     <div class="coupon-banner" style="background-color: ${primaryColor};" onclick="resgatarCupom('${appData.coupon.code}')">
-                        <div class="coupon-banner-title-inside" style="color: ${headerColor};">Pegue o seu Cupom!</div>
-                        <div class="coupon-banner-content">
-                            <span class="coupon-banner-text" style="color: ${headerColor};">${appData.coupon.text || 'Cupom Especial'}</span>
-                            <span class="coupon-banner-code" style="background-color: ${headerColor}; color: ${primaryColor};">${appData.coupon.code}</span>
+                        <span class="coupon-banner-text" style="color: ${headerColor};">${appData.coupon.text || 'Cupom Especial'}</span>
+                        <div class="coupon-code-wrapper">
+                            <div class="coupon-banner-title-inside" style="color: ${headerColor};">Pegue o seu Cupom!</div>
+                            <div class="coupon-banner-code" style="background-color: ${headerColor}; color: ${primaryColor};">${appData.coupon.code}</div>
                         </div>
                     </div>
                 `;
