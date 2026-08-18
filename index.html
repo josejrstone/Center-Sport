@@ -148,10 +148,10 @@
 
         .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .btn-save, .btn-add { background-color: #111; color: white; border: none; padding: 12px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px; }
-        .admin-item-list { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd; font-size: 13px; }
+        .admin-item-list { display: flex; justify-content: space-between; align-items: flex-start; background: white; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd; font-size: 13px; gap: 10px; flex-wrap: wrap; }
         .admin-item-list img { width: 40px; height: 20px; object-fit: cover; border-radius: 3px; margin-right: 10px; }
         
-        .admin-actions { display: flex; gap: 5px; }
+        .admin-actions { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
         .btn-action { background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
         .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
         .upload-or { text-align: center; font-size: 12px; color: #888; margin: 8px 0; font-weight: bold;}
@@ -202,23 +202,9 @@
 
         /* Cupom Banner Animado */
         .coupon-banner {
-            position: relative; width: 100%; 
+            position: relative; width: 100%;
             color: white; padding: 15px 20px; text-align: center; margin-bottom: 15px;
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .coupon-banner::before {
-            content: '';
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255,255,255,0.1) 25%, 
-                rgba(255,255,255,0.1) 50%, 
-                transparent 75%, 
-                transparent 100%);
-            background-size: 200% 100%;
-            animation: waveMove 4s ease-in-out infinite;
-            z-index: 1;
-            pointer-events: none;
         }
         .coupon-banner-content {
             display: flex; align-items: center; justify-content: center; gap: 8px; position: relative; z-index: 2;
@@ -227,11 +213,6 @@
         .coupon-banner-code {
             background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; font-weight: 700;
             font-size: 13px; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.3);
-        }
-        @keyframes waveMove {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 100% 0%; }
-            100% { background-position: 0% 0%; }
         }
     </style>
 </head>
@@ -1016,7 +997,6 @@
             document.getElementById('new-seller-wa').value = s.whatsapp;
             document.getElementById('new-seller-photo').value = s.photoUrl || '';
             document.getElementById('btn-seller-action').innerText = "💾 Salvar Alterações";
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
         function deleteSeller(id) {
@@ -1069,7 +1049,6 @@
             document.getElementById('edit-social-id').value = social.id;
             document.getElementById('new-social-url').value = social.url;
             document.getElementById('btn-social-action').innerText = '💾 Salvar Alterações';
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
         function moveSocial(index, direction) {
@@ -1125,7 +1104,6 @@
             document.getElementById('new-link-title').value = l.title;
             document.getElementById('new-link-url').value = l.url;
             document.getElementById('btn-link-action').innerText = "💾 Salvar Alterações";
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
         function moveLink(index, direction) {
@@ -1296,7 +1274,7 @@
             if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
                 const primaryColor = appData.colors.primary || '#16a34a';
                 const headerColor = appData.colors.header || '#111111';
-                const couponStyle = `background: linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor} 70%, ${headerColor} 100%);`;
+                const couponStyle = `background: linear-gradient(90deg, ${primaryColor} 50%, ${headerColor} 50%);`;
                 couponContainer.innerHTML = `
                     <div class="coupon-banner" style="${couponStyle}">
                         <div class="coupon-banner-content">
