@@ -411,13 +411,7 @@
                     <label>Código do Cupom:</label>
                     <input type="text" id="input-coupon-code" placeholder="Ex: CENTERSPORT2024" style="text-transform: uppercase;">
                 </div>
-                <div class="form-group">
-                    <label>Cor do Banner do Cupom (Hex):</label>
-                    <div class="color-row">
-                        <input type="text" id="input-coupon-color" placeholder="#16a34a" oninput="updateColorPreview('coupon')">
-                        <div id="preview-coupon" class="color-preview"></div>
-                    </div>
-                </div>
+                <p style="font-size:12px; color:#888; margin-top:10px;">💡 O banner usa gradiente automático com as cores da aparência (Primária + Topo)</p>
                 <button class="btn-save" onclick="saveCoupon()">Salvar Cupom</button>
             </div>
 
@@ -476,7 +470,7 @@
             colors: { primary: "#16a34a", header: "#111111" },
             store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "", faviconUrl: "" },
             banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"],
-            coupon: { enabled: false, text: "Aproveite nossos descontos especiais!", code: "CENTERSPORT2024", bannerColor: "#16a34a" },
+            coupon: { enabled: false, text: "Aproveite nossos descontos especiais!", code: "CENTERSPORT2024" },
             sellers: [
                 { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
             ],
@@ -644,7 +638,6 @@
         }
 
         async function saveToSupabase(showAlert = true) {
-            renderAdminView();
             setSyncStatus('syncing', 'Sincronizando...');
             try {
                 const { error } = await supabaseClient
@@ -666,6 +659,7 @@
             } catch (error) {
                 setSyncStatus('offline', 'Offline');
                 showToast("Erro ao salvar online.");
+                console.error('Erro ao salvar:', error);
             }
         }
 
@@ -774,6 +768,7 @@
             appData.banners.push(finalUrl);
             document.getElementById('new-banner-file').value = '';
             document.getElementById('new-banner-url').value = '';
+            renderAdminView();
             saveToSupabase(false);
             showToast("Banner adicionado!");
         }
@@ -783,12 +778,18 @@
             if (newIndex < 0 || newIndex >= appData.banners.length) return;
             const item = appData.banners.splice(index, 1)[0];
             appData.banners.splice(newIndex, 0, item);
+            renderAdminView();
             saveToSupabase(false);
         }
 
         function deleteBanner(index) {
             showConfirm("Excluir Banner", "Deseja remover este banner?", (res) => {
-                if (res) { appData.banners.splice(index, 1); saveToSupabase(false); showToast("Banner removido."); }
+                if (res) { 
+                    appData.banners.splice(index, 1);
+                    renderAdminView();
+                    saveToSupabase(false);
+                    showToast("Banner removido.");
+                }
             });
         }
 
@@ -824,6 +825,7 @@
             document.getElementById('new-logo-file').value = '';
             document.getElementById('new-favicon-file').value = '';
             
+            renderAdminView();
             saveToSupabase();
         }
 
@@ -988,6 +990,7 @@
             document.getElementById('btn-seller-action').innerText = "+ Adicionar Vendedor";
             sellerPendingCropFile = null;
             
+            renderAdminView();
             saveToSupabase(false);
         }
 
@@ -1005,7 +1008,12 @@
 
         function deleteSeller(id) {
             showConfirm("Excluir Vendedor", "Deseja remover este vendedor?", (res) => {
-                if (res) { appData.sellers = appData.sellers.filter(s => s.id !== id); saveToSupabase(false); showToast("Vendedor removido."); }
+                if (res) { 
+                    appData.sellers = appData.sellers.filter(s => s.id !== id);
+                    renderAdminView();
+                    saveToSupabase(false);
+                    showToast("Vendedor removido.");
+                }
             });
         }
 
@@ -1038,6 +1046,7 @@
             document.getElementById('new-social-url').value = '';
             document.getElementById('btn-social-action').innerText = "+ Adicionar Rede Social";
 
+            renderAdminView();
             saveToSupabase(false);
         }
 
@@ -1055,6 +1064,7 @@
             if (newIndex < 0 || newIndex >= (appData.socialLinks || []).length) return;
             const item = appData.socialLinks.splice(index, 1)[0];
             appData.socialLinks.splice(newIndex, 0, item);
+            renderAdminView();
             saveToSupabase(false);
         }
 
@@ -1062,6 +1072,7 @@
             showConfirm('Excluir rede social', 'Deseja remover este ícone?', (res) => {
                 if (res) {
                     appData.socialLinks = (appData.socialLinks || []).filter(item => item.id !== id);
+                    renderAdminView();
                     saveToSupabase(false);
                     showToast('Rede social removida.');
                 }
@@ -1090,6 +1101,7 @@
             document.getElementById('new-link-url').value = '';
             document.getElementById('btn-link-action').innerText = "+ Adicionar Link";
             
+            renderAdminView();
             saveToSupabase(false);
         }
 
@@ -1108,18 +1120,25 @@
             if (newIndex < 0 || newIndex >= appData.links.length) return;
             const item = appData.links.splice(index, 1)[0];
             appData.links.splice(newIndex, 0, item);
+            renderAdminView();
             saveToSupabase(false);
         }
 
         function deleteLink(id) {
             showConfirm("Excluir Link", "Deseja remover este botão?", (res) => {
-                if (res) { appData.links = appData.links.filter(l => l.id !== id); saveToSupabase(false); showToast("Link removido."); }
+                if (res) { 
+                    appData.links = appData.links.filter(l => l.id !== id);
+                    renderAdminView();
+                    saveToSupabase(false);
+                    showToast("Link removido.");
+                }
             });
         }
 
         function saveColors() { 
             appData.colors.primary = document.getElementById('input-color-primary').value || "#16a34a"; 
             appData.colors.header = document.getElementById('input-color-header').value || "#111111"; 
+            renderAdminView();
             saveToSupabase(); 
         }
 
@@ -1127,14 +1146,15 @@
             appData.coupon = {
                 enabled: document.getElementById('coupon-enabled').checked,
                 text: document.getElementById('input-coupon-text').value,
-                code: document.getElementById('input-coupon-code').value.toUpperCase(),
-                bannerColor: document.getElementById('input-coupon-color').value || appData.colors.primary
+                code: document.getElementById('input-coupon-code').value.toUpperCase()
             };
+            renderAdminView();
             saveToSupabase();
         }
 
         function saveFooter() { 
             appData.footerText = document.getElementById('input-footer-text').value; 
+            renderAdminView();
             saveToSupabase(); 
         }
 
@@ -1261,8 +1281,9 @@
             const couponContainer = document.getElementById('coupon-banner-container');
             couponContainer.innerHTML = '';
             if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
-                const couponColor = appData.coupon.bannerColor || appData.colors.primary;
-                const couponStyle = `background: linear-gradient(135deg, ${couponColor} 0%, ${couponColor}cc 100%);`;
+                const primaryColor = appData.colors.primary || '#16a34a';
+                const headerColor = appData.colors.header || '#111111';
+                const couponStyle = `background: linear-gradient(135deg, ${primaryColor} 0%, ${headerColor} 100%);`;
                 couponContainer.innerHTML = `
                     <div class="coupon-banner" style="${couponStyle}">
                         <div class="coupon-banner-animated"></div>
@@ -1388,8 +1409,6 @@
             document.getElementById('coupon-enabled').checked = (appData.coupon && appData.coupon.enabled) || false;
             document.getElementById('input-coupon-text').value = (appData.coupon && appData.coupon.text) || '';
             document.getElementById('input-coupon-code').value = (appData.coupon && appData.coupon.code) || '';
-            document.getElementById('input-coupon-color').value = (appData.coupon && appData.coupon.bannerColor) || appData.colors.primary;
-            updateColorPreview('coupon');
             document.getElementById('input-footer-text').value = appData.footerText;
 
             const bannersList = document.getElementById('admin-banners-list');
