@@ -76,15 +76,15 @@
 
         header {
             background-color: var(--header-bg); color: white; padding: 15px 20px;
-            display: flex; align-items: center; justify-content: center; user-select: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none;
         }
-        .store-info-header { display: flex; align-items: center; gap: 12px; cursor: pointer; width: 100%; justify-content: center; padding: 5px; }
-        .store-logo { width: 45px; height: 45px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; object-fit: cover; }
+        .store-info-header { display: flex; align-items: center; gap: 12px; cursor: pointer; width: 100%; justify-content: center; padding: 0; flex-direction: row; }
+        .store-logo { width: 45px; height: 45px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; object-fit: cover; flex-shrink: 0; }
         .store-text { display: flex; flex-direction: column; align-items: center; }
         .store-text h1 { font-size: 16px; font-weight: 600; }
         .store-text p { font-size: 11px; color: #9ca3af; }
-        .store-socials { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .store-social-link { width: 28px; height: 28px; border-radius: 50%; background-color: var(--primary-color); color: #fff; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-size: 12px; transition: transform 0.2s ease, opacity 0.2s ease; }
+        .store-socials { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; width: 100%; }
+        .store-social-link { width: 28px; height: 28px; border-radius: 50%; background-color: var(--header-bg); color: #fff; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-size: 12px; transition: transform 0.2s ease, opacity 0.2s ease; border: 2px solid var(--primary-color); }
         .store-social-link:hover { transform: translateY(-1px); opacity: 0.9; }
 
         .banner-container { padding: 20px; text-align: center; }
@@ -116,11 +116,11 @@
         .seller-whatsapp-badge { position: absolute; bottom: 0; right: -5px; background-color: #25d366; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid #fff; }
         .seller-name { font-size: 14px; font-weight: 600; color: var(--text-dark); }
         .seller-role { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
-        .btn-whatsapp { display: block; background-color: var(--primary-color); color: white; text-decoration: none; padding: 8px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
+        .btn-whatsapp { display: block; background-color: var(--header-bg); color: white; text-decoration: none; padding: 8px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
 
         .extra-links-section { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
-        .link-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
-        .link-btn:hover { background-color: var(--primary-color); color: white; }
+        .link-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--header-bg); border: 2px solid var(--header-bg); text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .link-btn:hover { background-color: var(--header-bg); color: white; }
 
         footer { margin-top: auto; padding: 20px; text-align: center; font-size: 12px; color: var(--text-light); background-color: rgba(0,0,0,0.02); }
 
@@ -202,7 +202,7 @@
 
         /* Cupom Banner Animado */
         .coupon-banner {
-            position: relative; width: 100%; background: linear-gradient(135deg, var(--primary-color) 0%, rgba(22,163,74,0.8) 100%);
+            position: relative; width: 100%; background: var(--coupon-banner-bg, linear-gradient(135deg, var(--primary-color) 0%, rgba(22,163,74,0.8) 100%));
             color: white; padding: 15px 20px; text-align: center; margin-bottom: 15px;
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
@@ -220,13 +220,6 @@
             animation: slideShimmer 3s infinite;
         }
         @keyframes slideShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        .coupon-banner-close {
-            position: absolute; top: 50%; right: 15px; transform: translateY(-50%);
-            background: rgba(255,255,255,0.2); border: none; color: white; font-size: 18px;
-            cursor: pointer; width: 24px; height: 24px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; transition: all 0.2s;
-        }
-        .coupon-banner-close:hover { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
@@ -258,9 +251,9 @@
                     <div class="store-text">
                         <h1 id="display-store-name">Center Sport</h1>
                         <p id="display-store-sub">Carregando...</p>
-                        <div id="store-socials" class="store-socials" aria-label="Redes sociais"></div>
                     </div>
                 </div>
+                <div id="store-socials" class="store-socials" aria-label="Redes sociais"></div>
             </header>
 
             <div class="banner-container" id="banner-section">
@@ -418,6 +411,13 @@
                     <label>Código do Cupom:</label>
                     <input type="text" id="input-coupon-code" placeholder="Ex: CENTERSPORT2024" style="text-transform: uppercase;">
                 </div>
+                <div class="form-group">
+                    <label>Cor do Banner do Cupom (Hex):</label>
+                    <div class="color-row">
+                        <input type="text" id="input-coupon-color" placeholder="#16a34a" oninput="updateColorPreview('coupon')">
+                        <div id="preview-coupon" class="color-preview"></div>
+                    </div>
+                </div>
                 <button class="btn-save" onclick="saveCoupon()">Salvar Cupom</button>
             </div>
 
@@ -476,7 +476,7 @@
             colors: { primary: "#16a34a", header: "#111111" },
             store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "", faviconUrl: "" },
             banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"],
-            coupon: { enabled: false, text: "Aproveite nossos descontos especiais!", code: "CENTERSPORT2024" },
+            coupon: { enabled: false, text: "Aproveite nossos descontos especiais!", code: "CENTERSPORT2024", bannerColor: "#16a34a" },
             sellers: [
                 { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
             ],
@@ -1127,7 +1127,8 @@
             appData.coupon = {
                 enabled: document.getElementById('coupon-enabled').checked,
                 text: document.getElementById('input-coupon-text').value,
-                code: document.getElementById('input-coupon-code').value.toUpperCase()
+                code: document.getElementById('input-coupon-code').value.toUpperCase(),
+                bannerColor: document.getElementById('input-coupon-color').value || appData.colors.primary
             };
             saveToSupabase();
         }
@@ -1260,14 +1261,15 @@
             const couponContainer = document.getElementById('coupon-banner-container');
             couponContainer.innerHTML = '';
             if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
+                const couponColor = appData.coupon.bannerColor || appData.colors.primary;
+                const couponStyle = `background: linear-gradient(135deg, ${couponColor} 0%, ${couponColor}cc 100%);`;
                 couponContainer.innerHTML = `
-                    <div class="coupon-banner">
+                    <div class="coupon-banner" style="${couponStyle}">
                         <div class="coupon-banner-animated"></div>
                         <div class="coupon-banner-content">
                             <span class="coupon-banner-text">${appData.coupon.text || 'Cupom Especial'}</span>
                             <span class="coupon-banner-code">${appData.coupon.code}</span>
                         </div>
-                        <button class="coupon-banner-close" onclick="this.parentElement.remove(); return false;">&times;</button>
                     </div>
                 `;
             }
@@ -1386,6 +1388,8 @@
             document.getElementById('coupon-enabled').checked = (appData.coupon && appData.coupon.enabled) || false;
             document.getElementById('input-coupon-text').value = (appData.coupon && appData.coupon.text) || '';
             document.getElementById('input-coupon-code').value = (appData.coupon && appData.coupon.code) || '';
+            document.getElementById('input-coupon-color').value = (appData.coupon && appData.coupon.bannerColor) || appData.colors.primary;
+            updateColorPreview('coupon');
             document.getElementById('input-footer-text').value = appData.footerText;
 
             const bannersList = document.getElementById('admin-banners-list');
