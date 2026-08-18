@@ -40,7 +40,6 @@
             flex-direction: column;
         }
 
-        /* Notificação Toast */
         #custom-toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
             background-color: #111; color: #fff; padding: 12px 20px; border-radius: 30px;
@@ -49,7 +48,6 @@
         }
         #custom-toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* Modal de Confirmação */
         #custom-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1001; padding: 20px;
@@ -83,9 +81,18 @@
         .store-text h1 { font-size: 16px; font-weight: 600; }
         .store-text p { font-size: 11px; color: #9ca3af; }
 
+        /* Banner Redimensionado e Ajustado para 1200x600 (Aspect Ratio 2:1) com Toque/Arrastar */
         .banner-container { padding: 20px; text-align: center; }
-        .banner-wrapper { position: relative; width: 100%; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; }
-        .banner-img { width: 100%; display: block; transition: opacity 0.5s ease-in-out; }
+        .banner-wrapper { 
+            position: relative; width: 100%; border-radius: 15px; overflow: hidden; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); background-color: #f3f4f6; 
+            aspect-ratio: 2 / 1; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; user-select: none;
+        }
+        .banner-img { 
+            width: 100%; height: 100%; object-fit: cover; display: block; 
+            transition: opacity 0.3s ease-in-out; pointer-events: none;
+        }
         .carousel-dots { margin-top: 10px; display: flex; justify-content: center; gap: 6px; }
         .dot { width: 8px; height: 8px; background-color: #d1d5db; border-radius: 50%; transition: all 0.3s; }
         .dot.active { background-color: var(--primary-color); width: 20px; border-radius: 4px; }
@@ -130,11 +137,19 @@
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: 600; color: #555; }
         .form-group input[type="text"], .form-group input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: white;}
+        
+        /* Preview de cores no Admin */
+        .color-row { display: flex; gap: 10px; align-items: center; }
+        .color-preview { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #ccc; flex-shrink: 0; }
+
         .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .btn-save, .btn-add { background-color: #111; color: white; border: none; padding: 12px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px; }
         .admin-item-list { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd; font-size: 13px; }
         .admin-item-list img { width: 40px; height: 20px; object-fit: cover; border-radius: 3px; margin-right: 10px; }
-        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        
+        .admin-actions { display: flex; gap: 5px; }
+        .btn-action { background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
         .upload-or { text-align: center; font-size: 12px; color: #888; margin: 8px 0; font-weight: bold;}
     </style>
 </head>
@@ -171,7 +186,8 @@
             </header>
 
             <div class="banner-container" id="banner-section">
-                <div class="banner-wrapper">
+                <!-- Banner com suporte a toque/arrastar e clique lateral -->
+                <div class="banner-wrapper" id="banner-wrapper">
                     <img id="display-banner-img" src="" alt="Banner" class="banner-img">
                 </div>
                 <div class="carousel-dots" id="carousel-dots"></div>
@@ -205,52 +221,70 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-palette"></i> Aparência</h3>
+                <h3><i class="fas fa-palette"></i> Aparência (Com Preview)</h3>
                 <div class="color-grid">
-                    <div class="form-group"><label>Cor Primária (Hex):</label><input type="text" id="input-color-primary" placeholder="#16a34a"></div>
-                    <div class="form-group"><label>Cor do Topo (Hex):</label><input type="text" id="input-color-header" placeholder="#111111"></div>
+                    <div class="form-group">
+                        <label>Cor Primária (Hex):</label>
+                        <div class="color-row">
+                            <input type="text" id="input-color-primary" placeholder="#16a34a" oninput="updateColorPreview('primary')">
+                            <div id="preview-primary" class="color-preview"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor do Topo (Hex):</label>
+                        <div class="color-row">
+                            <input type="text" id="input-color-header" placeholder="#111111" oninput="updateColorPreview('header')">
+                            <div id="preview-header" class="color-preview"></div>
+                        </div>
+                    </div>
                 </div>
                 <button class="btn-save" onclick="saveColors()">Salvar Cores</button>
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-store"></i> Loja</h3>
+                <h3><i class="fas fa-store"></i> Loja & Logo</h3>
                 <div class="form-group"><label>Nome da Loja:</label><input type="text" id="input-store-name"></div>
                 <div class="form-group"><label>Slogan:</label><input type="text" id="input-store-sub"></div>
+                
+                <div class="form-group"><label>Arquivo da Logo:</label><input type="file" id="new-logo-file" accept="image/*"></div>
+                <div class="upload-or">OU</div>
                 <div class="form-group"><label>URL da Logo:</label><input type="text" id="input-store-logo"></div>
+                
                 <button class="btn-save" onclick="saveStoreInfo()">Salvar Loja</button>
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-images"></i> Banners</h3>
+                <h3><i class="fas fa-images"></i> Banners (Reordenar)</h3>
                 <div id="admin-banners-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
-                <div class="form-group"><label>Arquivo do celular/PC:</label><input type="file" id="new-banner-file" accept="image/*"></div>
+                <div class="form-group"><label>Arquivo do Banner (1200x600):</label><input type="file" id="new-banner-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
                 <div class="form-group"><label>Colar URL da imagem:</label><input type="text" id="new-banner-url" placeholder="http://..."></div>
                 <button class="btn-add" onclick="addBanner()">+ Adicionar Banner</button>
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-users"></i> Vendedores</h3>
+                <h3><i class="fas fa-users"></i> Vendedores (Gerenciar)</h3>
                 <div id="admin-sellers-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
+                <input type="hidden" id="edit-seller-id" value="">
                 <div class="form-group"><label>Nome:</label><input type="text" id="new-seller-name"></div>
                 <div class="form-group"><label>Cargo:</label><input type="text" id="new-seller-role" value="Vendedor"></div>
                 <div class="form-group"><label>WhatsApp (só números):</label><input type="text" id="new-seller-wa" placeholder="5511999999999"></div>
-                <div class="form-group"><label>Foto do vendedor (Arquivo):</label><input type="file" id="new-seller-file" accept="image/*"></div>
+                <div class="form-group"><label>Foto (Arquivo):</label><input type="file" id="new-seller-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
-                <div class="form-group"><label>Colar URL da Foto:</label><input type="text" id="new-seller-photo" placeholder="http://..."></div>
-                <button class="btn-add" onclick="addSeller()">+ Adicionar Vendedor</button>
+                <div class="form-group"><label>URL da Foto:</label><input type="text" id="new-seller-photo" placeholder="http://..."></div>
+                <button class="btn-add" id="btn-seller-action" onclick="saveSeller()">+ Adicionar Vendedor</button>
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-link"></i> Links Extras</h3>
+                <h3><i class="fas fa-link"></i> Links Extras (Reordenar & Editar)</h3>
                 <div id="admin-links-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
+                <input type="hidden" id="edit-link-id" value="">
                 <div class="form-group"><label>Título:</label><input type="text" id="new-link-title"></div>
                 <div class="form-group"><label>URL:</label><input type="text" id="new-link-url"></div>
-                <button class="btn-add" onclick="addLink()">+ Adicionar</button>
+                <button class="btn-add" id="btn-link-action" onclick="saveLink()">+ Adicionar Link</button>
             </div>
 
             <div class="admin-section" style="margin-bottom: 50px;">
@@ -265,7 +299,7 @@
 
     <script>
         const SUPABASE_PROJECT_URL = 'https://yklanebzjhweviqwfbbp.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6InFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
         
         let supabaseClient = null;
         let appData = null;
@@ -278,7 +312,7 @@
         const defaultFallbackData = {
             colors: { primary: "#16a34a", header: "#111111" },
             store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "" },
-            banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=400&q=80"],
+            banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"],
             sellers: [
                 { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
             ],
@@ -315,6 +349,16 @@
             document.getElementById('loading-view').style.display = 'none';
         }
 
+        function updateColorPreview(type) {
+            const val = document.getElementById(`input-color-${type}`).value;
+            const preview = document.getElementById(`preview-${type}`);
+            if (/^#[0-9A-F]{3}$|^#[0-9A-F]{6}$/i.test(val)) {
+                preview.style.backgroundColor = val;
+            } else {
+                preview.style.backgroundColor = 'transparent';
+            }
+        }
+
         async function fetchAppData() {
             try {
                 if (window.supabase && window.supabase.createClient) {
@@ -327,7 +371,6 @@
                 const cachedTime = localStorage.getItem('center_sport_time');
                 const now = new Date().getTime();
 
-                // Usa cache de 24 horas para poupar o plano gratuito do Supabase
                 if (cachedData && cachedTime && (now - cachedTime < 24 * 60 * 60 * 1000)) {
                     appData = JSON.parse(cachedData);
                     applyColors();
@@ -337,7 +380,6 @@
                     return;
                 }
 
-                // Consulta segura sem restrição estrita de array
                 const { data, error } = await supabaseClient
                     .from('linktree_settings')
                     .select('config');
@@ -359,10 +401,8 @@
                 document.getElementById('public-view').style.display = 'flex';
                 
             } catch (error) {
-                console.error("Erro detalhado:", error);
                 const fallbackCache = localStorage.getItem('center_sport_cache');
                 appData = fallbackCache ? JSON.parse(fallbackCache) : defaultFallbackData;
-                
                 applyColors();
                 renderPublicView();
                 hideLoading();
@@ -441,6 +481,29 @@
             return publicData.publicUrl;
         }
 
+        // Redimensionador Automático para 1200x600 via Canvas
+        async function resizeImageToStandard(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 1200;
+                        canvas.height = 600;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, 1200, 600);
+                        canvas.toBlob((blob) => {
+                            const resizedFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+                            resolve(resizedFile);
+                        }, 'image/jpeg', 0.90);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         async function addBanner() {
             const fileInput = document.getElementById('new-banner-file').files[0];
             const urlInput = document.getElementById('new-banner-url').value;
@@ -449,9 +512,14 @@
             if (!fileInput && !urlInput) return showToast("Selecione um arquivo ou cole uma URL.");
 
             if (fileInput) {
-                showLoading("Enviando imagem...");
-                try { finalUrl = await uploadImage(fileInput, 'banners'); } 
-                catch (e) { hideLoading(); return showToast("Erro ao enviar: " + e.message); }
+                showLoading("Processando e redimensionando banner...");
+                try {
+                    const resizedFile = await resizeImageToStandard(fileInput);
+                    finalUrl = await uploadImage(resizedFile, 'banners');
+                } catch (e) {
+                    hideLoading();
+                    return showToast("Erro ao processar: " + e.message);
+                }
                 hideLoading();
             }
 
@@ -463,13 +531,47 @@
             showToast("Banner adicionado!");
         }
 
-        async function addSeller() {
+        function moveBanner(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= appData.banners.length) return;
+            const item = appData.banners.splice(index, 1)[0];
+            appData.banners.splice(newIndex, 0, item);
+            saveToSupabase(false);
+        }
+
+        function deleteBanner(index) {
+            showConfirm("Excluir Banner", "Deseja remover este banner?", (res) => {
+                if (res) { appData.banners.splice(index, 1); saveToSupabase(false); showToast("Banner removido."); }
+            });
+        }
+
+        async function saveStoreInfo() {
+            const name = document.getElementById('input-store-name').value;
+            const sub = document.getElementById('input-store-sub').value;
+            const fileInput = document.getElementById('new-logo-file').files[0];
+            let logoUrl = document.getElementById('input-store-logo').value;
+
+            if (fileInput) {
+                showLoading("Enviando logo...");
+                try { logoUrl = await uploadImage(fileInput, 'logos'); }
+                catch (e) { hideLoading(); return showToast("Erro ao enviar logo: " + e.message); }
+                hideLoading();
+            }
+
+            appData.store.name = name;
+            appData.store.subtitle = sub;
+            appData.store.logoUrl = logoUrl;
+            document.getElementById('new-logo-file').value = '';
+            saveToSupabase();
+        }
+
+        async function saveSeller() {
+            const id = document.getElementById('edit-seller-id').value;
             const name = document.getElementById('new-seller-name').value;
             const role = document.getElementById('new-seller-role').value;
             const wa = document.getElementById('new-seller-wa').value;
             const fileInput = document.getElementById('new-seller-file').files[0];
-            const urlInput = document.getElementById('new-seller-photo').value;
-            let photoUrl = urlInput;
+            let photoUrl = document.getElementById('new-seller-photo').value;
 
             if(!name || !wa) return showToast("Nome e WhatsApp são obrigatórios!");
 
@@ -480,29 +582,111 @@
                 hideLoading();
             }
 
-            const newId = appData.sellers.length > 0 ? Math.max(...appData.sellers.map(s => s.id)) + 1 : 1;
-            appData.sellers.push({ id: newId, name: name, role: role || 'Vendedor', whatsapp: wa.replace(/\D/g, ''), photoUrl: photoUrl });
+            if (id) {
+                // Editando
+                const seller = appData.sellers.find(s => s.id == id);
+                if (seller) {
+                    seller.name = name;
+                    seller.role = role;
+                    seller.whatsapp = wa.replace(/\D/g, '');
+                    if (photoUrl) seller.photoUrl = photoUrl;
+                }
+                showToast("Vendedor atualizado!");
+            } else {
+                // Adicionando novo
+                const newId = appData.sellers.length > 0 ? Math.max(...appData.sellers.map(s => s.id)) + 1 : 1;
+                appData.sellers.push({ id: newId, name: name, role: role || 'Vendedor', whatsapp: wa.replace(/\D/g, ''), photoUrl: photoUrl });
+                showToast("Vendedor adicionado!");
+            }
 
+            // Limpa form
+            document.getElementById('edit-seller-id').value = '';
             document.getElementById('new-seller-name').value = '';
+            document.getElementById('new-seller-role').value = 'Vendedor';
             document.getElementById('new-seller-wa').value = '';
             document.getElementById('new-seller-file').value = '';
             document.getElementById('new-seller-photo').value = '';
+            document.getElementById('btn-seller-action').innerText = "+ Adicionar Vendedor";
+            
             saveToSupabase(false);
-            showToast("Vendedor adicionado!");
         }
 
-        function openAdmin() {
-            document.getElementById('public-view').style.display = 'none';
-            document.getElementById('admin-view').style.display = 'block';
-            if(carouselTimer) clearInterval(carouselTimer);
-            renderAdminView();
+        function editSeller(id) {
+            const s = appData.sellers.find(item => item.id == id);
+            if (!s) return;
+            document.getElementById('edit-seller-id').value = s.id;
+            document.getElementById('new-seller-name').value = s.name;
+            document.getElementById('new-seller-role').value = s.role;
+            document.getElementById('new-seller-wa').value = s.whatsapp;
+            document.getElementById('new-seller-photo').value = s.photoUrl || '';
+            document.getElementById('btn-seller-action').innerText = "💾 Salvar Alterações";
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        function closeAdmin() {
-            document.getElementById('admin-view').style.display = 'none';
-            document.getElementById('public-view').style.display = 'flex';
-            applyColors();
-            renderPublicView(); 
+        function deleteSeller(id) {
+            showConfirm("Excluir Vendedor", "Deseja remover este vendedor?", (res) => {
+                if (res) { appData.sellers = appData.sellers.filter(s => s.id !== id); saveToSupabase(false); showToast("Vendedor removido."); }
+            });
+        }
+
+        async function saveLink() {
+            const id = document.getElementById('edit-link-id').value;
+            const title = document.getElementById('new-link-title').value;
+            const url = document.getElementById('new-link-url').value;
+
+            if(!title || !url) return showToast("Título e URL são obrigatórios!");
+
+            if (id) {
+                const link = appData.links.find(l => l.id == id);
+                if (link) { link.title = title; link.url = url; }
+                showToast("Link atualizado!");
+            } else {
+                const newId = appData.links.length > 0 ? Math.max(...appData.links.map(l => l.id)) + 1 : 1;
+                appData.links.push({ id: newId, title: title, url: url });
+                showToast("Link adicionado!");
+            }
+
+            document.getElementById('edit-link-id').value = '';
+            document.getElementById('new-link-title').value = '';
+            document.getElementById('new-link-url').value = '';
+            document.getElementById('btn-link-action').innerText = "+ Adicionar Link";
+            
+            saveToSupabase(false);
+        }
+
+        function editLink(id) {
+            const l = appData.links.find(item => item.id == id);
+            if (!l) return;
+            document.getElementById('edit-link-id').value = l.id;
+            document.getElementById('new-link-title').value = l.title;
+            document.getElementById('new-link-url').value = l.url;
+            document.getElementById('btn-link-action').innerText = "💾 Salvar Alterações";
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function moveLink(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= appData.links.length) return;
+            const item = appData.links.splice(index, 1)[0];
+            appData.links.splice(newIndex, 0, item);
+            saveToSupabase(false);
+        }
+
+        function deleteLink(id) {
+            showConfirm("Excluir Link", "Deseja remover este botão?", (res) => {
+                if (res) { appData.links = appData.links.filter(l => l.id !== id); saveToSupabase(false); showToast("Link removido."); }
+            });
+        }
+
+        function saveColors() { 
+            appData.colors.primary = document.getElementById('input-color-primary').value || "#16a34a"; 
+            appData.colors.header = document.getElementById('input-color-header').value || "#111111"; 
+            saveToSupabase(); 
+        }
+
+        function saveFooter() { 
+            appData.footerText = document.getElementById('input-footer-text').value; 
+            saveToSupabase(); 
         }
 
         function applyColors() {
@@ -560,16 +744,19 @@
             });
         }
 
+        // Lógica Limpa de Carrossel com Toque (Swipe) e Cliques Laterais
         function initCarousel() {
             const imgEl = document.getElementById('display-banner-img');
             const dotsEl = document.getElementById('carousel-dots');
             const section = document.getElementById('banner-section');
+            const wrapper = document.getElementById('banner-wrapper');
 
             if (carouselTimer) clearInterval(carouselTimer);
             if (!appData.banners || appData.banners.length === 0) { section.style.display = 'none'; return; }
 
             section.style.display = 'block';
-            currentBannerIdx = 0;
+            if (currentBannerIdx >= appData.banners.length) currentBannerIdx = 0;
+            
             const updateCarousel = () => {
                 imgEl.src = appData.banners[currentBannerIdx];
                 dotsEl.innerHTML = '';
@@ -577,66 +764,98 @@
                     appData.banners.forEach((_, idx) => { dotsEl.innerHTML += `<div class="dot ${idx === currentBannerIdx ? 'active' : ''}"></div>`; });
                 }
             };
+
             updateCarousel();
-            if (appData.banners.length > 1) carouselTimer = setInterval(() => { currentBannerIdx = (currentBannerIdx + 1) % appData.banners.length; updateCarousel(); }, 5000);
+
+            // Interatividade de cliques laterais e Swipe com dedo
+            let touchStartX = 0;
+            wrapper.ontouchstart = (e) => { touchStartX = e.touches[0].clientX; };
+            wrapper.ontouchend = (e) => {
+                let diff = e.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) currentBannerIdx = (currentBannerIdx - 1 + appData.banners.length) % appData.banners.length;
+                    else currentBannerIdx = (currentBannerIdx + 1) % appData.banners.length;
+                    updateCarousel();
+                }
+            };
+
+            wrapper.onclick = (e) => {
+                if (appData.banners.length <= 1) return;
+                const rect = wrapper.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                if (clickX < rect.width / 2) {
+                    currentBannerIdx = (currentBannerIdx - 1 + appData.banners.length) % appData.banners.length;
+                } else {
+                    currentBannerIdx = (currentBannerIdx + 1) % appData.banners.length;
+                }
+                updateCarousel();
+            };
+
+            if (appData.banners.length > 1) {
+                carouselTimer = setInterval(() => {
+                    currentBannerIdx = (currentBannerIdx + 1) % appData.banners.length;
+                    updateCarousel();
+                }, 5000);
+            }
         }
 
         function renderAdminView() {
             if(!appData) return;
             document.getElementById('input-color-primary').value = appData.colors.primary;
             document.getElementById('input-color-header').value = appData.colors.header;
+            updateColorPreview('primary');
+            updateColorPreview('header');
+
             document.getElementById('input-store-name').value = appData.store.name;
             document.getElementById('input-store-sub').value = appData.store.subtitle;
-            document.getElementById('input-store-logo').value = appData.store.logoUrl;
+            document.getElementById('input-store-logo').value = appData.store.logoUrl || '';
             document.getElementById('input-footer-text').value = appData.footerText;
 
+            // Banners com setas para reordenar
             const bannersList = document.getElementById('admin-banners-list');
             bannersList.innerHTML = '';
             (appData.banners || []).forEach((url, index) => {
-                bannersList.innerHTML += `<div class="admin-item-list"><div style="display:flex; align-items:center; overflow:hidden;"><img src="${url}" alt="banner"><span>Banner ${index + 1}</span></div><button class="btn-delete" onclick="deleteBanner(${index})"><i class="fas fa-trash"></i></button></div>`;
+                bannersList.innerHTML += `
+                    <div class="admin-item-list">
+                        <div style="display:flex; align-items:center; overflow:hidden;">
+                            <img src="${url}" alt="banner"><span>Banner ${index + 1}</span>
+                        </div>
+                        <div class="admin-actions">
+                            ${index > 0 ? `<button class="btn-action" onclick="moveBanner(${index}, -1)"><i class="fas fa-arrow-up"></i></button>` : ''}
+                            ${index < appData.banners.length - 1 ? `<button class="btn-action" onclick="moveBanner(${index}, 1)"><i class="fas fa-arrow-down"></i></button>` : ''}
+                            <button class="btn-delete" onclick="deleteBanner(${index})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
             });
 
+            // Vendedores com Botão Editar e Excluir
             const adminSellersList = document.getElementById('admin-sellers-list');
             adminSellersList.innerHTML = '';
             (appData.sellers || []).forEach(seller => {
-                adminSellersList.innerHTML += `<div class="admin-item-list"><div><strong>${seller.name}</strong> <small>(${seller.whatsapp})</small></div><button class="btn-delete" onclick="deleteSeller(${seller.id})"><i class="fas fa-trash"></i></button></div>`;
+                adminSellersList.innerHTML += `
+                    <div class="admin-item-list">
+                        <div><strong>${seller.name}</strong> <small>(${seller.whatsapp})</small></div>
+                        <div class="admin-actions">
+                            <button class="btn-action" onclick="editSeller(${seller.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" onclick="deleteSeller(${seller.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
             });
 
+            // Links com Reordenação e Edição
             const adminLinksList = document.getElementById('admin-links-list');
             adminLinksList.innerHTML = '';
-            (appData.links || []).forEach(link => {
-                adminLinksList.innerHTML += `<div class="admin-item-list"><div><strong>${link.title}</strong></div><button class="btn-delete" onclick="deleteLink(${link.id})"><i class="fas fa-trash"></i></button></div>`;
-            });
-        }
-
-        function saveColors() { appData.colors.primary = document.getElementById('input-color-primary').value || "#16a34a"; appData.colors.header = document.getElementById('input-color-header').value || "#111111"; saveToSupabase(); }
-        function saveStoreInfo() { appData.store.name = document.getElementById('input-store-name').value; appData.store.subtitle = document.getElementById('input-store-sub').value; appData.store.logoUrl = document.getElementById('input-store-logo').value; saveToSupabase(); }
-        function saveFooter() { appData.footerText = document.getElementById('input-footer-text').value; saveToSupabase(); }
-        
-        function deleteBanner(index) {
-            showConfirm("Excluir Banner", "Deseja remover este banner do carrossel?", (res) => {
-                if (res) { appData.banners.splice(index, 1); saveToSupabase(false); showToast("Banner removido."); }
-            });
-        }
-
-        function deleteSeller(id) {
-            showConfirm("Excluir Vendedor", "Deseja remover este vendedor da lista?", (res) => {
-                if (res) { appData.sellers = appData.sellers.filter(s => s.id !== id); saveToSupabase(false); showToast("Vendedor removido."); }
-            });
-        }
-        
-        function addLink() {
-            const title = document.getElementById('new-link-title').value; const url = document.getElementById('new-link-url').value;
-            if(!title || !url) return showToast("Título e URL são obrigatórios!");
-            const newId = appData.links.length > 0 ? Math.max(...appData.links.map(l => l.id)) + 1 : 1;
-            appData.links.push({ id: newId, title: title, url: url });
-            document.getElementById('new-link-title').value = ''; document.getElementById('new-link-url').value = ''; saveToSupabase(false);
-            showToast("Link adicionado!");
-        }
-
-        function deleteLink(id) {
-            showConfirm("Excluir Link", "Deseja remover este botão de link?", (res) => {
-                if (res) { appData.links = appData.links.filter(l => l.id !== id); saveToSupabase(false); showToast("Link removido."); }
+            (appData.links || []).forEach((link, index) => {
+                adminLinksList.innerHTML += `
+                    <div class="admin-item-list">
+                        <div><strong>${link.title}</strong></div>
+                        <div class="admin-actions">
+                            ${index > 0 ? `<button class="btn-action" onclick="moveLink(${index}, -1)"><i class="fas fa-arrow-up"></i></button>` : ''}
+                            ${index < appData.links.length - 1 ? `<button class="btn-action" onclick="moveLink(${index}, 1)"><i class="fas fa-arrow-down"></i></button>` : ''}
+                            <button class="btn-action" onclick="editLink(${link.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" onclick="deleteLink(${link.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
             });
         }
 
