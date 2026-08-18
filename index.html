@@ -40,6 +40,57 @@
             flex-direction: column;
         }
 
+        /* Notificação Toast Personalizada */
+        #custom-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #111;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 90%;
+            text-align: center;
+        }
+        #custom-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Modal de Confirmação Personalizado */
+        #custom-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            padding: 20px;
+        }
+        .modal-box {
+            background: white;
+            width: 100%;
+            max-width: 320px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .modal-box h3 { font-size: 16px; margin-bottom: 10px; color: var(--text-dark); }
+        .modal-box p { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .modal-btn-confirm { background-color: #ef4444; color: white; }
+        .modal-btn-cancel { background-color: #e5e7eb; color: #333; }
+
         #loading-view {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.95); display: flex; flex-direction: column;
@@ -120,6 +171,21 @@
 <body>
 
     <div class="app-container">
+        <!-- Toast de Notificação -->
+        <div id="custom-toast"><i class="fas fa-info-circle"></i> <span id="toast-msg">Mensagem</span></div>
+
+        <!-- Modal de Confirmação -->
+        <div id="custom-modal">
+            <div class="modal-box">
+                <h3 id="modal-title">Confirmação</h3>
+                <p id="modal-desc">Deseja realmente executar esta ação?</p>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-cancel" onclick="closeModal(false)">Cancelar</button>
+                    <button class="modal-btn modal-btn-confirm" id="modal-confirm-btn" onclick="closeModal(true)">Sim, excluir</button>
+                </div>
+            </div>
+        </div>
+
         <div id="loading-view">
             <div class="spinner"></div>
             <p id="loading-text">Carregando...</p>
@@ -230,17 +296,38 @@
     </div>
 
     <script>
-        // Nome de variável alterado para evitar re-declaração de 'supabase'
         const SUPABASE_PROJECT_URL = 'https://yklanebzjhweviqwfbbp.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6InFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
         
         let supabaseClient = null;
-
         let appData = null;
         let carouselTimer = null;
         let currentBannerIdx = 0;
         let clickCount = 0;
         let clickTimer = null;
+        let modalCallback = null;
+
+        // Sistema de Notificações Toast Bonitas
+        function showToast(message) {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-msg').innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // Sistema de Modal de Confirmação Bonito
+        function showConfirm(title, desc, callback) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('custom-modal').style.display = 'flex';
+            modalCallback = callback;
+        }
+
+        function closeModal(result) {
+            document.getElementById('custom-modal').style.display = 'none';
+            if (modalCallback) modalCallback(result);
+            modalCallback = null;
+        }
 
         function showLoading(text = "Carregando...") {
             document.getElementById('loading-text').innerText = text;
@@ -251,15 +338,30 @@
             document.getElementById('loading-view').style.display = 'none';
         }
 
+        // Sistema de Cache Local por 24 Horas para economizar requisições no Supabase Free
         async function fetchAppData() {
             try {
-                // Instancia o cliente usando o objeto global montado pela CDN
                 if (window.supabase && window.supabase.createClient) {
                     supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
                 } else {
-                    throw new Error("Biblioteca do Supabase não foi carregada corretamente.");
+                    throw new Error("Erro ao carregar SDK do Supabase.");
                 }
 
+                const cachedData = localStorage.getItem('center_sport_cache');
+                const cachedTime = localStorage.getItem('center_sport_time');
+                const now = new Date().getTime();
+
+                // Se houver cache com menos de 24 horas, usa ele sem gastar requisição do banco
+                if (cachedData && cachedTime && (now - cachedTime < 24 * 60 * 60 * 1000)) {
+                    appData = JSON.parse(cachedData);
+                    applyColors();
+                    renderPublicView();
+                    hideLoading();
+                    document.getElementById('public-view').style.display = 'flex';
+                    return;
+                }
+
+                // Caso contrário, busca do Supabase
                 const { data, error } = await supabaseClient
                     .from('linktree_settings')
                     .select('config')
@@ -269,6 +371,11 @@
                 if (error) throw error;
 
                 appData = data.config;
+                
+                // Salva no cache local por 24h
+                localStorage.setItem('center_sport_cache', JSON.stringify(appData));
+                localStorage.setItem('center_sport_time', now);
+
                 applyColors();
                 renderPublicView();
 
@@ -277,7 +384,39 @@
                 
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
-                document.getElementById('loading-text').innerText = "Erro ao conectar com o banco de dados.";
+                // Se falhar a rede mas tiver cache antigo, usa o cache como segurança
+                const fallbackCache = localStorage.getItem('center_sport_cache');
+                if (fallbackCache) {
+                    appData = JSON.parse(fallbackCache);
+                    applyColors();
+                    renderPublicView();
+                    hideLoading();
+                    document.getElementById('public-view').style.display = 'flex';
+                    showToast("Modo offline ativado (usando cache).");
+                } else {
+                    document.getElementById('loading-text').innerText = "Erro ao conectar com o banco de dados.";
+                }
+            }
+        }
+
+        async function saveToSupabase(showAlert = true) {
+            renderAdminView(); 
+
+            try {
+                const { error } = await supabaseClient
+                    .from('linktree_settings')
+                    .update({ config: appData })
+                    .eq('id', 1);
+
+                if (error) throw error;
+
+                // Atualiza o cache local imediatamente ao salvar
+                localStorage.setItem('center_sport_cache', JSON.stringify(appData));
+                localStorage.setItem('center_sport_time', new Date().getTime());
+
+                if (showAlert) showToast('Alterações salvas na nuvem com sucesso!');
+            } catch (error) {
+                showToast("Erro ao salvar online: " + error.message);
             }
         }
 
@@ -306,7 +445,7 @@
             const pwd = document.getElementById('admin-password').value;
             const btn = document.getElementById('btn-login');
 
-            if(!email || !pwd) return alert("Preencha e-mail e senha.");
+            if(!email || !pwd) return showToast("Preencha e-mail e senha.");
 
             btn.innerText = "Entrando...";
             
@@ -318,7 +457,7 @@
             btn.innerText = "Entrar";
 
             if (error) {
-                alert("Erro: E-mail ou Senha incorretos.");
+                showToast("E-mail ou Senha incorretos.");
             } else {
                 document.getElementById('login-view').style.display = 'none';
                 openAdmin();
@@ -330,7 +469,7 @@
         async function logoutAdmin() {
             await supabaseClient.auth.signOut();
             closeAdmin();
-            alert("Você saiu do sistema.");
+            showToast("Você saiu do sistema.");
         }
 
         async function uploadImage(file, folderName) {
@@ -351,28 +490,12 @@
             return publicData.publicUrl;
         }
 
-        async function saveToSupabase(showAlert = true) {
-            renderAdminView(); 
-
-            try {
-                const { error } = await supabaseClient
-                    .from('linktree_settings')
-                    .update({ config: appData })
-                    .eq('id', 1);
-
-                if (error) throw error;
-                if (showAlert) alert('Salvo com sucesso na nuvem!');
-            } catch (error) {
-                alert("Erro ao salvar online: " + error.message);
-            }
-        }
-
         async function addBanner() {
             const fileInput = document.getElementById('new-banner-file').files[0];
             const urlInput = document.getElementById('new-banner-url').value;
             let finalUrl = urlInput;
 
-            if (!fileInput && !urlInput) return alert("Selecione um arquivo ou cole uma URL.");
+            if (!fileInput && !urlInput) return showToast("Selecione um arquivo ou cole uma URL.");
 
             if (fileInput) {
                 showLoading("Enviando imagem...");
@@ -380,7 +503,7 @@
                     finalUrl = await uploadImage(fileInput, 'banners');
                 } catch (e) {
                     hideLoading();
-                    return alert("Erro ao enviar imagem: " + e.message);
+                    return showToast("Erro ao enviar: " + e.message);
                 }
                 hideLoading();
             }
@@ -391,6 +514,7 @@
             document.getElementById('new-banner-file').value = '';
             document.getElementById('new-banner-url').value = '';
             saveToSupabase(false);
+            showToast("Banner adicionado!");
         }
 
         async function addSeller() {
@@ -402,7 +526,7 @@
             const urlInput = document.getElementById('new-seller-photo').value;
             let photoUrl = urlInput;
 
-            if(!name || !wa) return alert("Nome e WhatsApp são obrigatórios!");
+            if(!name || !wa) return showToast("Nome e WhatsApp são obrigatórios!");
 
             if (fileInput) {
                 showLoading("Enviando foto...");
@@ -410,7 +534,7 @@
                     photoUrl = await uploadImage(fileInput, 'sellers');
                 } catch (e) {
                     hideLoading();
-                    return alert("Erro ao enviar foto: " + e.message);
+                    return showToast("Erro ao enviar: " + e.message);
                 }
                 hideLoading();
             }
@@ -423,6 +547,7 @@
             document.getElementById('new-seller-file').value = '';
             document.getElementById('new-seller-photo').value = '';
             saveToSupabase(false);
+            showToast("Vendedor adicionado!");
         }
 
         function openAdmin() {
@@ -546,17 +671,33 @@
         function saveColors() { appData.colors.primary = document.getElementById('input-color-primary').value || "#16a34a"; appData.colors.header = document.getElementById('input-color-header').value || "#111111"; saveToSupabase(); }
         function saveStoreInfo() { appData.store.name = document.getElementById('input-store-name').value; appData.store.subtitle = document.getElementById('input-store-sub').value; appData.store.logoUrl = document.getElementById('input-store-logo').value; saveToSupabase(); }
         function saveFooter() { appData.footerText = document.getElementById('input-footer-text').value; saveToSupabase(); }
-        function deleteBanner(index) { if(confirm('Excluir este banner?')) { appData.banners.splice(index, 1); saveToSupabase(false); } }
-        function deleteSeller(id) { if(confirm('Excluir vendedor?')) { appData.sellers = appData.sellers.filter(s => s.id !== id); saveToSupabase(false); } }
+        
+        function deleteBanner(index) {
+            showConfirm("Excluir Banner", "Deseja remover este banner do carrossel?", (res) => {
+                if (res) { appData.banners.splice(index, 1); saveToSupabase(false); showToast("Banner removido."); }
+            });
+        }
+
+        function deleteSeller(id) {
+            showConfirm("Excluir Vendedor", "Deseja remover este vendedor da lista?", (res) => {
+                if (res) { appData.sellers = appData.sellers.filter(s => s.id !== id); saveToSupabase(false); showToast("Vendedor removido."); }
+            });
+        }
         
         function addLink() {
             const title = document.getElementById('new-link-title').value; const url = document.getElementById('new-link-url').value;
-            if(!title || !url) return alert("Título e URL são obrigatórios!");
+            if(!title || !url) return showToast("Título e URL são obrigatórios!");
             const newId = appData.links.length > 0 ? Math.max(...appData.links.map(l => l.id)) + 1 : 1;
             appData.links.push({ id: newId, title: title, url: url });
             document.getElementById('new-link-title').value = ''; document.getElementById('new-link-url').value = ''; saveToSupabase(false);
+            showToast("Link adicionado!");
         }
-        function deleteLink(id) { if(confirm('Excluir este link?')) { appData.links = appData.links.filter(l => l.id !== id); saveToSupabase(false); } }
+
+        function deleteLink(id) {
+            showConfirm("Excluir Link", "Deseja remover este botão de link?", (res) => {
+                if (res) { appData.links = appData.links.filter(l => l.id !== id); saveToSupabase(false); showToast("Link removido."); }
+            });
+        }
 
         window.onload = fetchAppData;
     </script>
