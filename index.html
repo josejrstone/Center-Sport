@@ -360,7 +360,10 @@
         const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_F4Qu_vbE--MHjoVA2oRYDA_Kxb2Pq7Z';
         const STORAGE_KEYS = {
             supabaseUrl: 'center_sport_supabase_url',
-            supabaseAnonKey: 'center_sport_supabase_key'
+            supabaseAnonKey: 'center_sport_supabase_key',
+            cache: 'center_sport_cache',
+            cacheTime: 'center_sport_time',
+            forceRefresh: 'center_sport_force_refresh'
         };
 
         function getSupabaseConfig() {
@@ -485,16 +488,18 @@
                     throw new Error("SDK do Supabase indisponível.");
                 }
 
-                const cachedData = localStorage.getItem('center_sport_cache');
-                const cachedTime = localStorage.getItem('center_sport_time');
+                const cachedData = localStorage.getItem(STORAGE_KEYS.cache);
+                const cachedTime = localStorage.getItem(STORAGE_KEYS.cacheTime);
+                const forceRefresh = localStorage.getItem(STORAGE_KEYS.forceRefresh) === '1';
                 const now = new Date().getTime();
 
-                if (cachedData && cachedTime && (now - cachedTime < 24 * 60 * 60 * 1000)) {
+                if (!forceRefresh && cachedData && cachedTime && (now - Number(cachedTime) < 24 * 60 * 60 * 1000)) {
                     appData = JSON.parse(cachedData);
                     applyColors();
                     renderPublicView();
                     hideLoading();
                     document.getElementById('public-view').style.display = 'flex';
+                    localStorage.removeItem(STORAGE_KEYS.forceRefresh);
                     return;
                 }
 
@@ -509,17 +514,18 @@
                 } else {
                     appData = defaultFallbackData;
                 }
-                
-                localStorage.setItem('center_sport_cache', JSON.stringify(appData));
-                localStorage.setItem('center_sport_time', now);
+
+                localStorage.setItem(STORAGE_KEYS.cache, JSON.stringify(appData));
+                localStorage.setItem(STORAGE_KEYS.cacheTime, String(now));
+                localStorage.removeItem(STORAGE_KEYS.forceRefresh);
 
                 applyColors();
                 renderPublicView();
                 hideLoading();
                 document.getElementById('public-view').style.display = 'flex';
-                
+
             } catch (error) {
-                const fallbackCache = localStorage.getItem('center_sport_cache');
+                const fallbackCache = localStorage.getItem(STORAGE_KEYS.cache);
                 appData = fallbackCache ? JSON.parse(fallbackCache) : defaultFallbackData;
                 applyColors();
                 renderPublicView();
@@ -530,7 +536,7 @@
         }
 
         async function saveToSupabase(showAlert = true) {
-            renderAdminView(); 
+            renderAdminView();
             try {
                 const { error } = await supabaseClient
                     .from('linktree_settings')
@@ -539,10 +545,14 @@
 
                 if (error) throw error;
 
-                localStorage.setItem('center_sport_cache', JSON.stringify(appData));
-                localStorage.setItem('center_sport_time', new Date().getTime());
+                const now = new Date().getTime();
+                localStorage.setItem(STORAGE_KEYS.cache, JSON.stringify(appData));
+                localStorage.setItem(STORAGE_KEYS.cacheTime, String(now));
+                localStorage.setItem(STORAGE_KEYS.forceRefresh, '1');
 
                 if (showAlert) showToast('Salvo na nuvem com sucesso!');
+
+                window.dispatchEvent(new Event('center-sport-data-updated'));
             } catch (error) {
                 showToast("Erro ao salvar online.");
             }
@@ -1134,6 +1144,16 @@
                     </div>`;
             });
         }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === STORAGE_KEYS.forceRefresh && event.newValue === '1') {
+                fetchAppData();
+            }
+        });
+
+        window.addEventListener('center-sport-data-updated', () => {
+            fetchAppData();
+        });
 
         window.onload = fetchAppData;
     </script>
