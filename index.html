@@ -199,6 +199,34 @@
         }
         .sync-dot.syncing { background: #f59e0b; }
         .sync-dot.offline { background: #ef4444; }
+
+        /* Cupom Banner Animado */
+        .coupon-banner {
+            position: relative; width: 100%; background: linear-gradient(135deg, var(--primary-color) 0%, rgba(22,163,74,0.8) 100%);
+            color: white; padding: 15px 20px; text-align: center; margin-bottom: 15px;
+            overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .coupon-banner-content {
+            display: flex; align-items: center; justify-content: center; gap: 8px; position: relative; z-index: 2;
+        }
+        .coupon-banner-text { font-size: 14px; font-weight: 600; }
+        .coupon-banner-code {
+            background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; font-weight: 700;
+            font-size: 13px; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.3);
+        }
+        .coupon-banner-animated {
+            position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: slideShimmer 3s infinite;
+        }
+        @keyframes slideShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .coupon-banner-close {
+            position: absolute; top: 50%; right: 15px; transform: translateY(-50%);
+            background: rgba(255,255,255,0.2); border: none; color: white; font-size: 18px;
+            cursor: pointer; width: 24px; height: 24px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .coupon-banner-close:hover { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
@@ -241,6 +269,8 @@
                 </div>
                 <div class="carousel-dots" id="carousel-dots"></div>
             </div>
+
+            <div id="coupon-banner-container"></div>
 
             <section class="sellers-section">
                 <div class="section-title"><h2>Fale com nossos vendedores</h2></div>
@@ -374,6 +404,23 @@
                 <button class="btn-add" id="btn-link-action" onclick="saveLink()">+ Adicionar Link</button>
             </div>
 
+            <div class="admin-section">
+                <h3><i class="fas fa-ticket"></i> Cupom Promocional</h3>
+                <div class="form-group">
+                    <label>Ativar Cupom?</label>
+                    <input type="checkbox" id="coupon-enabled" style="width:20px; height:20px; cursor:pointer;">
+                </div>
+                <div class="form-group">
+                    <label>Texto do Cupom:</label>
+                    <input type="text" id="input-coupon-text" placeholder="Ex: Aproveite nossos descontos especiais!">
+                </div>
+                <div class="form-group">
+                    <label>Código do Cupom:</label>
+                    <input type="text" id="input-coupon-code" placeholder="Ex: CENTERSPORT2024" style="text-transform: uppercase;">
+                </div>
+                <button class="btn-save" onclick="saveCoupon()">Salvar Cupom</button>
+            </div>
+
             <div class="admin-section" style="margin-bottom: 50px;">
                 <h3><i class="fas fa-copyright"></i> Rodapé</h3>
                 <div class="form-group"><label>Texto:</label><input type="text" id="input-footer-text"></div>
@@ -429,6 +476,7 @@
             colors: { primary: "#16a34a", header: "#111111" },
             store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "", faviconUrl: "" },
             banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"],
+            coupon: { enabled: false, text: "Aproveite nossos descontos especiais!", code: "CENTERSPORT2024" },
             sellers: [
                 { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
             ],
@@ -1075,6 +1123,15 @@
             saveToSupabase(); 
         }
 
+        function saveCoupon() {
+            appData.coupon = {
+                enabled: document.getElementById('coupon-enabled').checked,
+                text: document.getElementById('input-coupon-text').value,
+                code: document.getElementById('input-coupon-code').value.toUpperCase()
+            };
+            saveToSupabase();
+        }
+
         function saveFooter() { 
             appData.footerText = document.getElementById('input-footer-text').value; 
             saveToSupabase(); 
@@ -1156,6 +1213,7 @@
             base.store = { ...defaultFallbackData.store, ...(base.store || {}) };
             base.banners = Array.isArray(base.banners) ? base.banners : defaultFallbackData.banners;
             base.sellers = Array.isArray(base.sellers) ? base.sellers : defaultFallbackData.sellers;
+            base.coupon = base.coupon || defaultFallbackData.coupon;
             base.links = legacyLinks;
             base.socialLinks = legacySocialLinks.filter(Boolean);
             base.footerText = base.footerText || defaultFallbackData.footerText;
@@ -1198,11 +1256,32 @@
 
             initCarousel();
 
+            // Renderizar Banner de Cupom
+            const couponContainer = document.getElementById('coupon-banner-container');
+            couponContainer.innerHTML = '';
+            if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
+                couponContainer.innerHTML = `
+                    <div class="coupon-banner">
+                        <div class="coupon-banner-animated"></div>
+                        <div class="coupon-banner-content">
+                            <span class="coupon-banner-text">${appData.coupon.text || 'Cupom Especial'}</span>
+                            <span class="coupon-banner-code">${appData.coupon.code}</span>
+                        </div>
+                        <button class="coupon-banner-close" onclick="this.parentElement.remove(); return false;">&times;</button>
+                    </div>
+                `;
+            }
+
             const sellersGrid = document.getElementById('sellers-grid');
             sellersGrid.innerHTML = ''; 
             const randomSellers = shuffleArray([...(appData.sellers || [])]);
             randomSellers.forEach(seller => {
-                const linkWA = `https://wa.me/${seller.whatsapp}`;
+                let linkWA = `https://wa.me/${seller.whatsapp}`;
+                // Adicionar cupom na mensagem se estiver ativado
+                if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
+                    const couponMsg = `Olá, vi seu cupom: *${appData.coupon.code}*`;
+                    linkWA += `?text=${encodeURIComponent(couponMsg)}`;
+                }
                 const photoSrc = seller.photoUrl || 'https://via.placeholder.com/80';
                 sellersGrid.innerHTML += `
                     <div class="seller-card">
@@ -1304,6 +1383,9 @@
             document.getElementById('input-store-sub').value = appData.store.subtitle;
             document.getElementById('input-store-logo').value = appData.store.logoUrl || '';
             document.getElementById('input-store-favicon').value = appData.store.faviconUrl || '';
+            document.getElementById('coupon-enabled').checked = (appData.coupon && appData.coupon.enabled) || false;
+            document.getElementById('input-coupon-text').value = (appData.coupon && appData.coupon.text) || '';
+            document.getElementById('input-coupon-code').value = (appData.coupon && appData.coupon.code) || '';
             document.getElementById('input-footer-text').value = appData.footerText;
 
             const bannersList = document.getElementById('admin-banners-list');
@@ -1405,6 +1487,7 @@
         }
 
         setupAutoRefresh();
+        setupSellerCropInteractions();
         window.onload = () => fetchAppData({ forceRemote: false });
     </script>
 </body>
