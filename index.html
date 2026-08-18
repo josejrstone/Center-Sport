@@ -2,151 +2,34 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Center Sport - Links</title>
-    <link id="dynamic-favicon" rel="icon" type="image/x-icon" href="">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Center Sport</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <style>
-        :root { --primary-color: #16a34a; --header-bg: #111111; --app-bg: #ffffff; --text-dark: #111111; --text-light: #6b7280; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #e5e7eb; display: flex; justify-content: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 480px; background-color: var(--app-bg); min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        
-        /* Ajuste do cabeçalho para exibir as redes sociais */
-        .header-content { display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .social-links-section { display: flex; justify-content: center; gap: 15px; padding: 10px 0; }
-        .social-link { color: var(--primary-color); font-size: 24px; transition: opacity 0.2s; }
-        .social-link:hover { opacity: 0.8; }
-
-        /* Resto do CSS mantido para consistência */
-        #custom-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background-color: #111; color: #fff; padding: 12px 20px; border-radius: 30px; font-size: 13px; z-index: 1000; transition: transform 0.3s; display: flex; align-items: center; gap: 10px; }
-        #custom-toast.show { transform: translateX(-50%) translateY(0); }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        header { background-color: var(--header-bg); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: center; user-select: none; }
-        .store-info-header { display: flex; align-items: center; gap: 12px; cursor: pointer; justify-content: center; text-align: center; }
-        .store-logo { width: 45px; height: 45px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
-        .store-text h1 { font-size: 16px; font-weight: 600; }
-        .store-text p { font-size: 11px; color: #9ca3af; }
-        .banner-wrapper { width: 100%; aspect-ratio: 2 / 1; border-radius: 15px; overflow: hidden; background: #eee; }
-        .banner-img { width: 100%; height: 100%; object-fit: cover; }
-        .sellers-section { padding: 20px; }
-        .seller-card { border: 1px solid #eee; border-radius: 15px; padding: 15px; text-align: center; }
-        .btn-whatsapp { display: block; background-color: var(--primary-color); color: white; padding: 8px; border-radius: 20px; text-decoration: none; font-size: 12px; margin-top: 10px; }
-        .extra-links-section { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 10px; }
-        .link-btn { text-align: center; border: 2px solid var(--primary-color); color: var(--primary-color); padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; }
-        
-        .admin-section { background: #f9fafb; padding: 15px; margin: 10px; border-radius: 10px; }
-        .admin-item-list { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 5px; }
-        .admin-actions { display: flex; gap: 5px; }
-        .btn-action, .btn-delete { border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; color: white; }
-        .btn-action { background: #3b82f6; }
-        .btn-delete { background: #ef4444; }
-        .btn-save, .btn-add { background: #111; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%; font-weight: bold; }
-    </style>
 </head>
 <body>
-
-    <div class="app-container">
-        <div id="custom-toast"><i class="fas fa-info-circle"></i> <span id="toast-msg"></span></div>
-        <div id="loading-view"><div class="spinner"></div><p id="loading-text">Carregando...</p></div>
-
-        <div id="public-view" style="display:none; flex-direction: column; min-height: 100vh;">
-            <header>
-                <div class="header-content" onclick="handleSecretClick()">
-                    <div class="store-info-header">
-                        <div id="display-logo" class="store-logo">C</div>
-                        <div class="store-text">
-                            <h1 id="display-store-name">Center Sport</h1>
-                            <p id="display-store-sub"></p>
-                        </div>
-                    </div>
-                    <div class="social-links-section" id="social-links-container"></div>
-                </div>
-            </header>
-
-            <div class="banner-container"><div class="banner-wrapper" id="banner-wrapper"><img id="display-banner-img" class="banner-img"></div></div>
-            <section class="sellers-section"><div class="sellers-grid" id="sellers-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div></section>
-            <section class="extra-links-section" id="extra-links-grid"></section>
-            <footer id="display-footer"></footer>
-        </div>
-
-        <div id="login-view" style="display:none; padding:20px;">
-            <div class="login-box"><input type="email" id="admin-email" placeholder="E-mail"><input type="password" id="admin-password" placeholder="Senha"><button class="btn-login" onclick="attemptLogin()">Entrar</button></div>
-        </div>
-
-        <div id="admin-view" style="display:none; padding:20px;">
-            <button onclick="closeAdmin()">Fechar</button>
-            <div class="admin-section">
-                <h3>Redes Sociais</h3>
-                <div id="admin-social-list"></div>
-                <div class="form-group"><input type="text" id="new-social-url" placeholder="https://instagram.com/..."></div>
-                <button class="btn-add" onclick="addSocial()">+ Adicionar Rede</button>
-            </div>
-            <!-- Outras seções admin (banners, vendedores, links mantidos)... -->
-        </div>
+    <div id="loading">Carregando...</div>
+    <div id="app" style="display:none;">
+        <h1 id="store-name"></h1>
+        <div id="social-container"></div>
     </div>
 
     <script>
-        // ... (Configurações Supabase e variáveis)
-        
-        function getSocialIcon(url) {
-            if (url.includes('instagram')) return 'fa-instagram';
-            if (url.includes('facebook')) return 'fa-facebook';
-            if (url.includes('tiktok')) return 'fa-tiktok';
-            if (url.includes('youtube')) return 'fa-youtube';
-            if (url.includes('twitter') || url.includes('x.com')) return 'fa-x-twitter';
-            return 'fa-globe';
-        }
+        const supabase = supabase.createClient('https://yklanebzjhweviqwfbbp.supabase.co', 'SUA_CHAVE_AQUI');
 
-        function renderPublicView() {
-            // ... (restante da renderização)
-            
-            // Render Redes Sociais
-            const socialContainer = document.getElementById('social-links-container');
-            socialContainer.innerHTML = '';
-            (appData.socials || []).forEach(s => {
-                socialContainer.innerHTML += `<a href="${s.url}" target="_blank" class="social-link"><i class="fab ${getSocialIcon(s.url)}"></i></a>`;
-            });
+        async function init() {
+            try {
+                const { data, error } = await supabase.from('linktree_settings').select('config').eq('id', 1).single();
+                if (error) throw error;
+                
+                // Renderização básica garantida
+                document.getElementById('store-name').innerText = data.config.store.name;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            } catch (e) {
+                document.getElementById('loading').innerText = "Erro ao carregar. Verifique o console.";
+                console.error(e);
+            }
         }
-
-        function addSocial() {
-            const url = document.getElementById('new-social-url').value;
-            if(!url) return;
-            if(!appData.socials) appData.socials = [];
-            appData.socials.push({ id: Date.now(), url: url });
-            document.getElementById('new-social-url').value = '';
-            saveToSupabase();
-        }
-
-        function moveSocial(index, dir) {
-            const newIdx = index + dir;
-            if(newIdx < 0 || newIdx >= appData.socials.length) return;
-            const item = appData.socials.splice(index, 1)[0];
-            appData.socials.splice(newIdx, 0, item);
-            saveToSupabase();
-        }
-
-        function deleteSocial(id) {
-            appData.socials = appData.socials.filter(s => s.id !== id);
-            saveToSupabase();
-        }
-
-        // Adicione essas chamadas no renderAdminView:
-        /*
-        const socialList = document.getElementById('admin-social-list');
-        (appData.socials || []).forEach((s, idx) => {
-            socialList.innerHTML += `<div class="admin-item-list"><span>${s.url}</span>
-                <div class="admin-actions">
-                    <button class="btn-action" onclick="moveSocial(${idx}, -1)">▲</button>
-                    <button class="btn-action" onclick="moveSocial(${idx}, 1)">▼</button>
-                    <button class="btn-delete" onclick="deleteSocial(${s.id})">X</button>
-                </div></div>`;
-        });
-        */
+        init();
     </script>
 </body>
 </html>
