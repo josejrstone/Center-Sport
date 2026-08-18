@@ -1294,7 +1294,7 @@
         }
 
         function renderAdminView() {
-            if(!appData) return;
+            appData = normalizeAppData(appData || defaultFallbackData);
             document.getElementById('input-color-primary').value = appData.colors.primary;
             document.getElementById('input-color-header').value = appData.colors.header;
             updateColorPreview('primary');
@@ -1337,13 +1337,14 @@
 
             const adminSocialsList = document.getElementById('admin-socials-list');
             adminSocialsList.innerHTML = '';
-            if (!(appData.socialLinks || []).length) {
+            const socialLinks = Array.isArray(appData.socialLinks) ? appData.socialLinks : [];
+            if (!socialLinks.length) {
                 adminSocialsList.innerHTML = `
                     <div class="admin-item-list">
                         <div><strong>Sem redes sociais</strong><br><small>Adicione uma URL para que o ícone apareça na página pública.</small></div>
                     </div>`;
             } else {
-                (appData.socialLinks || []).forEach((social, index) => {
+                socialLinks.forEach((social, index) => {
                     if (!social) return;
                     const info = getSocialPlatformInfo(social.platform);
                     adminSocialsList.innerHTML += `
@@ -1351,7 +1352,7 @@
                             <div><strong>${info ? info.label : getSocialPlatformLabel(social.platform || 'social')}</strong><br><small>${social.url}</small></div>
                             <div class="admin-actions">
                                 ${index > 0 ? `<button class="btn-action" onclick="moveSocial(${index}, -1)"><i class="fas fa-arrow-up"></i></button>` : ''}
-                                ${index < appData.socialLinks.length - 1 ? `<button class="btn-action" onclick="moveSocial(${index}, 1)"><i class="fas fa-arrow-down"></i></button>` : ''}
+                                ${index < socialLinks.length - 1 ? `<button class="btn-action" onclick="moveSocial(${index}, 1)"><i class="fas fa-arrow-down"></i></button>` : ''}
                                 <button class="btn-action" onclick="editSocial(${social.id})"><i class="fas fa-edit"></i></button>
                                 <button class="btn-delete" onclick="deleteSocial(${social.id})"><i class="fas fa-trash"></i></button>
                             </div>
