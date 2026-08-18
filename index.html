@@ -514,7 +514,7 @@
             }
         }
 
-        async function fetchAppData() {
+        async function fetchAppData({ forceRemote = false } = {}) {
             try {
                 if (!initSupabaseClient()) {
                     throw new Error("SDK do Supabase indisponível.");
@@ -524,8 +524,9 @@
                 const cachedTime = localStorage.getItem(STORAGE_KEYS.cacheTime);
                 const forceRefresh = localStorage.getItem(STORAGE_KEYS.forceRefresh) === '1';
                 const now = new Date().getTime();
+                const hasValidCache = !!cachedData && !!cachedTime && (now - Number(cachedTime) < 24 * 60 * 60 * 1000);
 
-                if (!forceRefresh && cachedData && cachedTime && (now - Number(cachedTime) < 24 * 60 * 60 * 1000)) {
+                if (!forceRemote && !forceRefresh && hasValidCache && document.visibilityState === 'hidden') {
                     appData = JSON.parse(cachedData);
                     applyColors();
                     renderPublicView();
@@ -533,6 +534,13 @@
                     document.getElementById('public-view').style.display = 'flex';
                     localStorage.removeItem(STORAGE_KEYS.forceRefresh);
                     return;
+                }
+
+                if (!forceRemote && !forceRefresh && hasValidCache && document.visibilityState === 'visible') {
+                    appData = JSON.parse(cachedData);
+                    applyColors();
+                    renderPublicView();
+                    document.getElementById('public-view').style.display = 'flex';
                 }
 
                 const { data, error } = await supabaseClient
@@ -543,7 +551,7 @@
 
                 if (data && data.length > 0) {
                     appData = data[0].config;
-                } else {
+                } else if (!hasValidCache) {
                     appData = defaultFallbackData;
                 }
 
@@ -1112,7 +1120,9 @@
             document.getElementById('public-view').style.display = 'none';
             document.getElementById('admin-view').style.display = 'block';
             if(carouselTimer) clearInterval(carouselTimer);
-            renderAdminView();
+            fetchAppData({ forceRemote: true }).then(() => {
+                renderAdminView();
+            });
         }
 
         function closeAdmin() {
@@ -1183,24 +1193,33 @@
         function setupAutoRefresh() {
             window.addEventListener('storage', (event) => {
                 if (event.key === STORAGE_KEYS.forceRefresh && event.newValue === '1') {
-                    fetchAppData();
+                    fetchAppData({ forceRemote: true });
                 }
             });
 
             window.addEventListener('focus', () => {
-                const forceRefresh = localStorage.getItem(STORAGE_KEYS.forceRefresh) === '1';
-                if (forceRefresh) {
-                    fetchAppData();
+                fetchAppData({ forceRemote: true });
+            });
+
+            window.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    fetchAppData({ forceRemote: true });
                 }
             });
 
             window.addEventListener('center-sport-data-updated', () => {
-                fetchAppData();
+                fetchAppData({ forceRemote: true });
             });
+
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    fetchAppData({ forceRemote: true });
+                }
+            }, 15000);
         }
 
         setupAutoRefresh();
-        window.onload = fetchAppData;
+        window.onload = () => fetchAppData({ forceRemote: false });
     </script>
 </body>
 </html>
