@@ -116,11 +116,11 @@
         .seller-whatsapp-badge { position: absolute; bottom: 0; right: -5px; background-color: #25d366; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid #fff; }
         .seller-name { font-size: 14px; font-weight: 600; color: var(--text-dark); }
         .seller-role { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
-        .btn-whatsapp { display: block; background-color: var(--header-bg); color: white; text-decoration: none; padding: 8px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
+        .btn-whatsapp { display: block; background-color: var(--primary-color); color: white; text-decoration: none; padding: 8px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
 
         .extra-links-section { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
-        .link-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--header-bg); border: 2px solid var(--header-bg); text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
-        .link-btn:hover { background-color: var(--header-bg); color: white; }
+        .link-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .link-btn:hover { background-color: var(--primary-color); color: white; }
 
         footer { margin-top: auto; padding: 20px; text-align: center; font-size: 12px; color: var(--text-light); background-color: rgba(0,0,0,0.02); }
 
@@ -1283,7 +1283,7 @@
             if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
                 const primaryColor = appData.colors.primary || '#16a34a';
                 const headerColor = appData.colors.header || '#111111';
-                const couponStyle = `background: linear-gradient(135deg, ${primaryColor} 0%, ${headerColor} 100%);`;
+                const couponStyle = `background: linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor} 70%, ${headerColor} 100%);`;
                 couponContainer.innerHTML = `
                     <div class="coupon-banner" style="${couponStyle}">
                         <div class="coupon-banner-animated"></div>
