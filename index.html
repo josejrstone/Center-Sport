@@ -203,7 +203,7 @@
         /* Cupom Banner Animado */
         .coupon-banner {
             position: relative; width: 100%;
-            color: white; padding: 15px 20px; text-align: center; margin-bottom: 15px;
+            padding: 15px 20px; text-align: center; margin-bottom: 15px;
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .coupon-banner-content {
@@ -211,8 +211,8 @@
         }
         .coupon-banner-text { font-size: 14px; font-weight: 600; }
         .coupon-banner-code {
-            background: var(--header-bg); color: white; padding: 6px 12px; border-radius: 6px; font-weight: 700;
-            font-size: 13px; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 12px; border-radius: 6px; font-weight: 700;
+            font-size: 13px; letter-spacing: 1px;
         }
     </style>
 </head>
@@ -1293,11 +1293,12 @@
             couponContainer.innerHTML = '';
             if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
                 const primaryColor = appData.colors.primary || '#16a34a';
+                const headerColor = appData.colors.header || '#111111';
                 couponContainer.innerHTML = `
                     <div class="coupon-banner" style="background-color: ${primaryColor};">
                         <div class="coupon-banner-content">
-                            <span class="coupon-banner-text">${appData.coupon.text || 'Cupom Especial'}</span>
-                            <span class="coupon-banner-code">${appData.coupon.code}</span>
+                            <span class="coupon-banner-text" style="color: ${headerColor};">${appData.coupon.text || 'Cupom Especial'}</span>
+                            <span class="coupon-banner-code" style="background-color: ${headerColor}; color: ${primaryColor};">${appData.coupon.code}</span>
                         </div>
                     </div>
                 `;
