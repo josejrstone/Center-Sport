@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Minha Loja - Linktree</title>
+    <title>Center Sport - Links</title>
     <!-- Fonte Google -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Ícones FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS -->
+    <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -40,11 +40,11 @@
             flex-direction: column;
         }
 
-        /* ================= TELAS DE CARREGAMENTO ================= */
         #loading-view {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); display: flex; flex-direction: column;
+            background: rgba(255,255,255,0.95); display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 200; color: var(--text-dark);
+            padding: 20px; text-align: center;
         }
         .spinner {
             width: 40px; height: 40px; border: 4px solid #f3f3f3;
@@ -53,7 +53,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ================= HEADER ================= */
         header {
             background-color: var(--header-bg); color: white; padding: 15px 20px;
             display: flex; align-items: center; justify-content: center; user-select: none;
@@ -63,7 +62,6 @@
         .store-text h1 { font-size: 16px; font-weight: 600; }
         .store-text p { font-size: 11px; color: #9ca3af; }
 
-        /* ================= BANNER ================= */
         .banner-container { padding: 20px; text-align: center; }
         .banner-wrapper { position: relative; width: 100%; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; }
         .banner-img { width: 100%; display: block; transition: opacity 0.5s ease-in-out; }
@@ -71,7 +69,6 @@
         .dot { width: 8px; height: 8px; background-color: #d1d5db; border-radius: 50%; transition: all 0.3s; }
         .dot.active { background-color: var(--primary-color); width: 20px; border-radius: 4px; }
 
-        /* ================= VENDEDORES ================= */
         .sellers-section { padding: 0 20px 20px 20px; }
         .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
         .section-title::before { content: ''; display: block; width: 4px; height: 24px; background-color: var(--primary-color); border-radius: 2px; }
@@ -88,15 +85,12 @@
         .seller-role { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
         .btn-whatsapp { display: block; background-color: var(--primary-color); color: white; text-decoration: none; padding: 8px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
 
-        /* ================= LINKS ================= */
         .extra-links-section { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
         .link-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
         .link-btn:hover { background-color: var(--primary-color); color: white; }
 
-        /* ================= FOOTER ================= */
         footer { margin-top: auto; padding: 20px; text-align: center; font-size: 12px; color: var(--text-light); background-color: rgba(0,0,0,0.02); }
 
-        /* ================= ADMIN & LOGIN ================= */
         #login-view, #admin-view {
             display: none; padding: 20px; background: white; min-height: 100vh;
             color: #333; position: absolute; top: 0; left: 0; width: 100%; z-index: 100; overflow-y: auto;
@@ -126,20 +120,17 @@
 <body>
 
     <div class="app-container">
-        
-        <!-- Tela de Carregamento -->
         <div id="loading-view">
             <div class="spinner"></div>
             <p id="loading-text">Carregando...</p>
         </div>
 
-        <!-- VISÃO DO PÚBLICO -->
         <div id="public-view" style="display:none; flex-direction: column; min-height: 100vh;">
             <header>
                 <div class="store-info-header" onclick="handleSecretClick()">
-                    <div id="display-logo" class="store-logo">M</div>
+                    <div id="display-logo" class="store-logo">C</div>
                     <div class="store-text">
-                        <h1 id="display-store-name">Loja</h1>
+                        <h1 id="display-store-name">Center Sport</h1>
                         <p id="display-store-sub">Carregando...</p>
                     </div>
                 </div>
@@ -162,7 +153,6 @@
             <footer id="display-footer"></footer>
         </div>
 
-        <!-- TELA DE LOGIN (AGORA COM SUPABASE AUTH) -->
         <div id="login-view">
             <div class="login-box">
                 <h2>🔐 Acesso Restrito</h2>
@@ -174,7 +164,6 @@
             </div>
         </div>
 
-        <!-- VISÃO DO ADMIN -->
         <div id="admin-view">
             <div class="admin-header">
                 <h2>⚙️ Painel Admin</h2>
@@ -202,12 +191,9 @@
                 <h3><i class="fas fa-images"></i> Banners</h3>
                 <div id="admin-banners-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
-                
-                <!-- UPLOAD DE BANNER -->
-                <div class="form-group"><label>Arquivo do seu celular/PC:</label><input type="file" id="new-banner-file" accept="image/*"></div>
+                <div class="form-group"><label>Arquivo do celular/PC:</label><input type="file" id="new-banner-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
                 <div class="form-group"><label>Colar URL da imagem:</label><input type="text" id="new-banner-url" placeholder="http://..."></div>
-                
                 <button class="btn-add" onclick="addBanner()">+ Adicionar Banner</button>
             </div>
 
@@ -218,12 +204,9 @@
                 <div class="form-group"><label>Nome:</label><input type="text" id="new-seller-name"></div>
                 <div class="form-group"><label>Cargo:</label><input type="text" id="new-seller-role" value="Vendedor"></div>
                 <div class="form-group"><label>WhatsApp (só números):</label><input type="text" id="new-seller-wa" placeholder="5511999999999"></div>
-                
-                <!-- UPLOAD DE FOTO DO VENDEDOR -->
                 <div class="form-group"><label>Foto do vendedor (Arquivo):</label><input type="file" id="new-seller-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
                 <div class="form-group"><label>Colar URL da Foto:</label><input type="text" id="new-seller-photo" placeholder="http://..."></div>
-                
                 <button class="btn-add" onclick="addSeller()">+ Adicionar Vendedor</button>
             </div>
 
@@ -242,17 +225,16 @@
                 <button class="btn-save" onclick="saveFooter()">Salvar Rodapé</button>
             </div>
             
-            <!-- Botão de Sair -->
             <button class="btn-delete" style="width: 100%; margin-bottom: 30px; padding: 15px;" onclick="logoutAdmin()">Sair da Conta (Logout)</button>
         </div>
     </div>
 
     <script>
-        // CONFIGURAÇÕES SUPABASE
-        const supabaseUrl = 'https://yklanebzjhweviqwfbbp.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
+        // Nome de variável alterado para evitar re-declaração de 'supabase'
+        const SUPABASE_PROJECT_URL = 'https://yklanebzjhweviqwfbbp.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
         
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+        let supabaseClient = null;
 
         let appData = null;
         let carouselTimer = null;
@@ -260,7 +242,6 @@
         let clickCount = 0;
         let clickTimer = null;
 
-        // Mostrar Loading Animado
         function showLoading(text = "Carregando...") {
             document.getElementById('loading-text').innerText = text;
             document.getElementById('loading-view').style.display = 'flex';
@@ -270,13 +251,19 @@
             document.getElementById('loading-view').style.display = 'none';
         }
 
-        // INICIALIZAÇÃO
         async function fetchAppData() {
             try {
-                const { data, error } = await supabase
+                // Instancia o cliente usando o objeto global montado pela CDN
+                if (window.supabase && window.supabase.createClient) {
+                    supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+                } else {
+                    throw new Error("Biblioteca do Supabase não foi carregada corretamente.");
+                }
+
+                const { data, error } = await supabaseClient
                     .from('linktree_settings')
                     .select('config')
-                    .eq('id', 1)
+                    .limit(1)
                     .single();
 
                 if (error) throw error;
@@ -290,11 +277,10 @@
                 
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
-                alert("Erro ao conectar no banco de dados.");
+                document.getElementById('loading-text').innerText = "Erro ao conectar com o banco de dados.";
             }
         }
 
-        // ================= SISTEMA DE LOGIN (SUPABASE AUTH) =================
         async function handleSecretClick() {
             clickCount++;
             if (clickTimer) clearTimeout(clickTimer);
@@ -304,14 +290,13 @@
                 clickCount = 0;
                 showLoading("Verificando acesso...");
                 
-                // Verifica se já está logado
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 hideLoading();
 
                 if (session) {
-                    openAdmin(); // Já tem sessão, entra direto
+                    openAdmin();
                 } else {
-                    document.getElementById('login-view').style.display = 'block'; // Pede login
+                    document.getElementById('login-view').style.display = 'block';
                 }
             }
         }
@@ -325,8 +310,7 @@
 
             btn.innerText = "Entrando...";
             
-            // Login Real no Supabase
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: pwd,
             });
@@ -344,50 +328,45 @@
         function closeLogin() { document.getElementById('login-view').style.display = 'none'; }
 
         async function logoutAdmin() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             closeAdmin();
-            alert("Você saiu do sistema com segurança.");
+            alert("Você saiu do sistema.");
         }
 
-        // ================= FUNÇÕES DE UPLOAD DE IMAGEM (STORAGE) =================
         async function uploadImage(file, folderName) {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
             const filePath = `${folderName}/${fileName}`;
 
-            // Faz o upload para o bucket 'linktree_uploads'
-            const { data, error } = await supabase.storage
+            const { data, error } = await supabaseClient.storage
                 .from('linktree_uploads')
                 .upload(filePath, file);
 
             if (error) throw error;
 
-            // Pega a URL pública
-            const { data: publicData } = supabase.storage
+            const { data: publicData } = supabaseClient.storage
                 .from('linktree_uploads')
                 .getPublicUrl(filePath);
 
             return publicData.publicUrl;
         }
 
-        // SALVAMENTO NO SUPABASE DATABASE
         async function saveToSupabase(showAlert = true) {
             renderAdminView(); 
 
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('linktree_settings')
                     .update({ config: appData })
                     .eq('id', 1);
 
                 if (error) throw error;
-                if (showAlert) alert('Salvo com sucesso na nuvem! ☁️');
+                if (showAlert) alert('Salvo com sucesso na nuvem!');
             } catch (error) {
                 alert("Erro ao salvar online: " + error.message);
             }
         }
 
-        // ================= LÓGICA DO PAINEL ADMIN (ATUALIZADA) =================
         async function addBanner() {
             const fileInput = document.getElementById('new-banner-file').files[0];
             const urlInput = document.getElementById('new-banner-url').value;
@@ -446,7 +425,6 @@
             saveToSupabase(false);
         }
 
-        // Demais funções se mantêm idênticas...
         function openAdmin() {
             document.getElementById('public-view').style.display = 'none';
             document.getElementById('admin-view').style.display = 'block';
@@ -581,7 +559,6 @@
         function deleteLink(id) { if(confirm('Excluir este link?')) { appData.links = appData.links.filter(l => l.id !== id); saveToSupabase(false); } }
 
         window.onload = fetchAppData;
-
     </script>
 </body>
 </html>
