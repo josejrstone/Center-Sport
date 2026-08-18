@@ -80,8 +80,12 @@
         }
         .store-info-header { display: flex; align-items: center; gap: 12px; cursor: pointer; width: 100%; justify-content: center; padding: 5px; }
         .store-logo { width: 45px; height: 45px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; object-fit: cover; }
+        .store-text { display: flex; flex-direction: column; align-items: center; }
         .store-text h1 { font-size: 16px; font-weight: 600; }
         .store-text p { font-size: 11px; color: #9ca3af; }
+        .store-socials { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .store-social-link { width: 28px; height: 28px; border-radius: 50%; background-color: var(--primary-color); color: #fff; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-size: 12px; transition: transform 0.2s ease, opacity 0.2s ease; }
+        .store-social-link:hover { transform: translateY(-1px); opacity: 0.9; }
 
         .banner-container { padding: 20px; text-align: center; }
         .banner-wrapper { 
@@ -226,6 +230,7 @@
                     <div class="store-text">
                         <h1 id="display-store-name">Center Sport</h1>
                         <p id="display-store-sub">Carregando...</p>
+                        <div id="store-socials" class="store-socials" aria-label="Redes sociais"></div>
                     </div>
                 </div>
             </header>
@@ -351,6 +356,15 @@
             </div>
 
             <div class="admin-section">
+                <h3><i class="fas fa-share-nodes"></i> Redes Sociais</h3>
+                <div id="admin-socials-list"></div>
+                <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
+                <input type="hidden" id="edit-social-id" value="">
+                <div class="form-group"><label>URL da rede social:</label><input type="text" id="new-social-url" placeholder="https://instagram.com/..."></div>
+                <button class="btn-add" id="btn-social-action" onclick="saveSocial()">+ Adicionar Rede Social</button>
+            </div>
+
+            <div class="admin-section">
                 <h3><i class="fas fa-link"></i> Links Extras</h3>
                 <div id="admin-links-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
@@ -417,6 +431,11 @@
             banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"],
             sellers: [
                 { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
+            ],
+            socialLinks: [
+                { id: 1, platform: "instagram", url: "https://instagram.com/centersport" },
+                { id: 2, platform: "facebook", url: "https://facebook.com/centersport" },
+                { id: 3, platform: "youtube", url: "https://youtube.com/@centersport" }
             ],
             links: [{ id: 1, title: "🌐 Acesse nosso Site", url: "#" }],
             footerText: "© 2026 Center Sport - Todos os direitos reservados"
@@ -550,9 +569,10 @@
                 if (error) throw error;
 
                 if (data && data.length > 0) {
-                    appData = data[0].config;
+                    const remoteConfig = data[0]?.config && typeof data[0].config === 'object' ? data[0].config : null;
+                    appData = normalizeAppData(remoteConfig || defaultFallbackData);
                 } else if (!hasValidCache) {
-                    appData = defaultFallbackData;
+                    appData = normalizeAppData(defaultFallbackData);
                 }
 
                 localStorage.setItem(STORAGE_KEYS.cache, JSON.stringify(appData));
@@ -566,7 +586,7 @@
 
             } catch (error) {
                 const fallbackCache = localStorage.getItem(STORAGE_KEYS.cache);
-                appData = fallbackCache ? JSON.parse(fallbackCache) : defaultFallbackData;
+                appData = normalizeAppData(fallbackCache ? JSON.parse(fallbackCache) : defaultFallbackData);
                 applyColors();
                 renderPublicView();
                 hideLoading();
@@ -941,6 +961,65 @@
             });
         }
 
+        async function saveSocial() {
+            const id = document.getElementById('edit-social-id').value;
+            const url = document.getElementById('new-social-url').value.trim();
+
+            if (!url) return showToast('Informe a URL da rede social.');
+
+            const platform = detectSocialPlatform(url);
+            if (!platform) {
+                return showToast('URL não reconhecida. Use Instagram, Facebook, TikTok, YouTube ou Twitter/X.');
+            }
+
+            if (id) {
+                const social = (appData.socialLinks || []).find(item => item.id == id);
+                if (social) {
+                    social.url = url;
+                    social.platform = platform;
+                }
+                showToast('Rede social atualizada!');
+            } else {
+                const newId = (appData.socialLinks || []).length > 0 ? Math.max(...(appData.socialLinks || []).map(item => item.id)) + 1 : 1;
+                appData.socialLinks = appData.socialLinks || [];
+                appData.socialLinks.push({ id: newId, platform, url });
+                showToast('Rede social adicionada!');
+            }
+
+            document.getElementById('edit-social-id').value = '';
+            document.getElementById('new-social-url').value = '';
+            document.getElementById('btn-social-action').innerText = "+ Adicionar Rede Social";
+
+            saveToSupabase(false);
+        }
+
+        function editSocial(id) {
+            const social = (appData.socialLinks || []).find(item => item.id == id);
+            if (!social) return;
+            document.getElementById('edit-social-id').value = social.id;
+            document.getElementById('new-social-url').value = social.url;
+            document.getElementById('btn-social-action').innerText = '💾 Salvar Alterações';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function moveSocial(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= (appData.socialLinks || []).length) return;
+            const item = appData.socialLinks.splice(index, 1)[0];
+            appData.socialLinks.splice(newIndex, 0, item);
+            saveToSupabase(false);
+        }
+
+        function deleteSocial(id) {
+            showConfirm('Excluir rede social', 'Deseja remover este ícone?', (res) => {
+                if (res) {
+                    appData.socialLinks = (appData.socialLinks || []).filter(item => item.id !== id);
+                    saveToSupabase(false);
+                    showToast('Rede social removida.');
+                }
+            });
+        }
+
         async function saveLink() {
             const id = document.getElementById('edit-link-id').value;
             const title = document.getElementById('new-link-title').value;
@@ -1018,13 +1097,78 @@
             return array;
         }
 
+        function getSocialPlatformLabel(platform) {
+            const labels = {
+                instagram: 'Instagram',
+                facebook: 'Facebook',
+                tiktok: 'TikTok',
+                youtube: 'YouTube',
+                twitter: 'Twitter (X)'
+            };
+            return labels[platform] || 'Rede social';
+        }
+
+        function getSocialPlatformInfo(platform) {
+            const config = {
+                instagram: { icon: 'fa-brands fa-instagram', label: 'Instagram' },
+                facebook: { icon: 'fa-brands fa-facebook-f', label: 'Facebook' },
+                tiktok: { icon: 'fa-brands fa-tiktok', label: 'TikTok' },
+                youtube: { icon: 'fa-brands fa-youtube', label: 'YouTube' },
+                twitter: { icon: 'fa-brands fa-x-twitter', label: 'Twitter (X)' }
+            };
+            return config[platform] || null;
+        }
+
+        function detectSocialPlatform(url) {
+            if (!url) return null;
+            try {
+                const value = url.trim();
+                const parsed = new URL(value.startsWith('http') ? value : `https://${value}`);
+                const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
+
+                if (host.includes('instagram.com')) return 'instagram';
+                if (host.includes('facebook.com') || host.includes('fb.com')) return 'facebook';
+                if (host.includes('tiktok.com')) return 'tiktok';
+                if (host.includes('youtube.com') || host.includes('youtu.be')) return 'youtube';
+                if (host.includes('twitter.com') || host.includes('x.com')) return 'twitter';
+            } catch (error) {
+                return null;
+            }
+            return null;
+        }
+
+        function normalizeAppData(data) {
+            const base = data && typeof data === 'object' ? data : defaultFallbackData;
+            const legacySocialLinks = Array.isArray(base.socialLinks)
+                ? base.socialLinks
+                : Array.isArray(base.social_links)
+                    ? base.social_links
+                    : Array.isArray(base.socials)
+                        ? base.socials
+                        : defaultFallbackData.socialLinks;
+            const legacyLinks = Array.isArray(base.links)
+                ? base.links
+                : Array.isArray(base.extraLinks)
+                    ? base.extraLinks
+                    : defaultFallbackData.links;
+
+            base.colors = { ...defaultFallbackData.colors, ...(base.colors || {}) };
+            base.store = { ...defaultFallbackData.store, ...(base.store || {}) };
+            base.banners = Array.isArray(base.banners) ? base.banners : defaultFallbackData.banners;
+            base.sellers = Array.isArray(base.sellers) ? base.sellers : defaultFallbackData.sellers;
+            base.links = legacyLinks;
+            base.socialLinks = legacySocialLinks.filter(Boolean);
+            base.footerText = base.footerText || defaultFallbackData.footerText;
+            return base;
+        }
+
         function renderPublicView() {
             if(!appData) return;
 
+            appData = normalizeAppData(appData);
             document.getElementById('display-store-name').innerText = appData.store.name;
             document.getElementById('display-store-sub').innerText = appData.store.subtitle;
-            
-            // Aplica Favicon se existir
+
             const favEl = document.getElementById('dynamic-favicon');
             if (appData.store.faviconUrl) {
                 favEl.href = appData.store.faviconUrl;
@@ -1034,6 +1178,23 @@
             if (appData.store.logoUrl) logoDisplay.innerHTML = `<img src="${appData.store.logoUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
             else logoDisplay.innerHTML = appData.store.name.charAt(0).toUpperCase();
             document.getElementById('display-footer').innerText = appData.footerText;
+
+            const socialContainer = document.getElementById('store-socials');
+            socialContainer.innerHTML = '';
+            (appData.socialLinks || []).forEach((social) => {
+                if (!social || !social.url || !social.platform) return;
+                const info = getSocialPlatformInfo(social.platform);
+                if (!info) return;
+                const link = document.createElement('a');
+                link.href = social.url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'store-social-link';
+                link.title = info.label;
+                link.innerHTML = `<i class="${info.icon}"></i>`;
+                socialContainer.appendChild(link);
+            });
+            socialContainer.style.display = socialContainer.children.length ? 'flex' : 'none';
 
             initCarousel();
 
@@ -1173,6 +1334,30 @@
                         </div>
                     </div>`;
             });
+
+            const adminSocialsList = document.getElementById('admin-socials-list');
+            adminSocialsList.innerHTML = '';
+            if (!(appData.socialLinks || []).length) {
+                adminSocialsList.innerHTML = `
+                    <div class="admin-item-list">
+                        <div><strong>Sem redes sociais</strong><br><small>Adicione uma URL para que o ícone apareça na página pública.</small></div>
+                    </div>`;
+            } else {
+                (appData.socialLinks || []).forEach((social, index) => {
+                    if (!social) return;
+                    const info = getSocialPlatformInfo(social.platform);
+                    adminSocialsList.innerHTML += `
+                        <div class="admin-item-list">
+                            <div><strong>${info ? info.label : getSocialPlatformLabel(social.platform || 'social')}</strong><br><small>${social.url}</small></div>
+                            <div class="admin-actions">
+                                ${index > 0 ? `<button class="btn-action" onclick="moveSocial(${index}, -1)"><i class="fas fa-arrow-up"></i></button>` : ''}
+                                ${index < appData.socialLinks.length - 1 ? `<button class="btn-action" onclick="moveSocial(${index}, 1)"><i class="fas fa-arrow-down"></i></button>` : ''}
+                                <button class="btn-action" onclick="editSocial(${social.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn-delete" onclick="deleteSocial(${social.id})"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>`;
+                });
+            }
 
             const adminLinksList = document.getElementById('admin-links-list');
             adminLinksList.innerHTML = '';
