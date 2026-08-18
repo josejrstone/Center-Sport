@@ -206,6 +206,15 @@
             color: white; padding: 15px 20px; text-align: center; margin-bottom: 15px;
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+        .coupon-banner-wave {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%), 
+                        radial-gradient(circle at 80% 80%, rgba(0,0,0,0.05) 0%, transparent 50%);
+            background-size: 200% 200%;
+            animation: waveFlow 6s ease-in-out infinite;
+            opacity: 0.6;
+            pointer-events: none;
+        }
         .coupon-banner-content {
             display: flex; align-items: center; justify-content: center; gap: 8px; position: relative; z-index: 2;
         }
@@ -214,12 +223,11 @@
             background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; font-weight: 700;
             font-size: 13px; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.3);
         }
-        .coupon-banner-animated {
-            position: absolute; top: 0; left: 0; width: 200%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: slideShimmer 3s infinite;
+        @keyframes waveFlow {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
         }
-        @keyframes slideShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     </style>
 </head>
 <body>
@@ -1286,7 +1294,7 @@
                 const couponStyle = `background: linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor} 70%, ${headerColor} 100%);`;
                 couponContainer.innerHTML = `
                     <div class="coupon-banner" style="${couponStyle}">
-                        <div class="coupon-banner-animated"></div>
+                        <div class="coupon-banner-wave" style="background: radial-gradient(circle at 20% 50%, ${headerColor}40 0%, transparent 50%), radial-gradient(circle at 80% 80%, ${primaryColor}20 0%, transparent 50%);"></div>
                         <div class="coupon-banner-content">
                             <span class="coupon-banner-text">${appData.coupon.text || 'Cupom Especial'}</span>
                             <span class="coupon-banner-code">${appData.coupon.code}</span>
