@@ -40,50 +40,21 @@
             flex-direction: column;
         }
 
-        /* Notificação Toast Personalizada */
+        /* Notificação Toast */
         #custom-toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background-color: #111;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-size: 13px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 90%;
-            text-align: center;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background-color: #111; color: #fff; padding: 12px 20px; border-radius: 30px;
+            font-size: 13px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: transform 0.3s ease;
+            z-index: 1000; display: flex; align-items: center; gap: 10px; max-width: 90%; text-align: center;
         }
-        #custom-toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        #custom-toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* Modal de Confirmação Personalizado */
+        /* Modal de Confirmação */
         #custom-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1001; padding: 20px;
         }
-        .modal-box {
-            background: white;
-            width: 100%;
-            max-width: 320px;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
+        .modal-box { background: white; width: 100%; max-width: 320px; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
         .modal-box h3 { font-size: 16px; margin-bottom: 10px; color: var(--text-dark); }
         .modal-box p { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
         .modal-buttons { display: flex; gap: 10px; }
@@ -94,8 +65,7 @@
         #loading-view {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.95); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 200; color: var(--text-dark);
-            padding: 20px; text-align: center;
+            align-items: center; justify-content: center; z-index: 200; color: var(--text-dark); padding: 20px; text-align: center;
         }
         .spinner {
             width: 40px; height: 40px; border: 4px solid #f3f3f3;
@@ -171,10 +141,8 @@
 <body>
 
     <div class="app-container">
-        <!-- Toast de Notificação -->
         <div id="custom-toast"><i class="fas fa-info-circle"></i> <span id="toast-msg">Mensagem</span></div>
 
-        <!-- Modal de Confirmação -->
         <div id="custom-modal">
             <div class="modal-box">
                 <h3 id="modal-title">Confirmação</h3>
@@ -297,7 +265,7 @@
 
     <script>
         const SUPABASE_PROJECT_URL = 'https://yklanebzjhweviqwfbbp.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6InFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
         
         let supabaseClient = null;
         let appData = null;
@@ -307,7 +275,17 @@
         let clickTimer = null;
         let modalCallback = null;
 
-        // Sistema de Notificações Toast Bonitas
+        const defaultFallbackData = {
+            colors: { primary: "#16a34a", header: "#111111" },
+            store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "" },
+            banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=400&q=80"],
+            sellers: [
+                { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
+            ],
+            links: [{ id: 1, title: "🌐 Acesse nosso Site", url: "#" }],
+            footerText: "© 2026 Center Sport - Todos os direitos reservados"
+        };
+
         function showToast(message) {
             const toast = document.getElementById('custom-toast');
             document.getElementById('toast-msg').innerText = message;
@@ -315,7 +293,6 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // Sistema de Modal de Confirmação Bonito
         function showConfirm(title, desc, callback) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-desc').innerText = desc;
@@ -338,20 +315,19 @@
             document.getElementById('loading-view').style.display = 'none';
         }
 
-        // Sistema de Cache Local por 24 Horas para economizar requisições no Supabase Free
         async function fetchAppData() {
             try {
                 if (window.supabase && window.supabase.createClient) {
                     supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
                 } else {
-                    throw new Error("Erro ao carregar SDK do Supabase.");
+                    throw new Error("SDK do Supabase indisponível.");
                 }
 
                 const cachedData = localStorage.getItem('center_sport_cache');
                 const cachedTime = localStorage.getItem('center_sport_time');
                 const now = new Date().getTime();
 
-                // Se houver cache com menos de 24 horas, usa ele sem gastar requisição do banco
+                // Usa cache de 24 horas para poupar o plano gratuito do Supabase
                 if (cachedData && cachedTime && (now - cachedTime < 24 * 60 * 60 * 1000)) {
                     appData = JSON.parse(cachedData);
                     applyColors();
@@ -361,47 +337,42 @@
                     return;
                 }
 
-                // Caso contrário, busca do Supabase
+                // Consulta segura sem restrição estrita de array
                 const { data, error } = await supabaseClient
                     .from('linktree_settings')
-                    .select('config')
-                    .limit(1)
-                    .single();
+                    .select('config');
 
                 if (error) throw error;
 
-                appData = data.config;
+                if (data && data.length > 0) {
+                    appData = data[0].config;
+                } else {
+                    appData = defaultFallbackData;
+                }
                 
-                // Salva no cache local por 24h
                 localStorage.setItem('center_sport_cache', JSON.stringify(appData));
                 localStorage.setItem('center_sport_time', now);
 
                 applyColors();
                 renderPublicView();
-
                 hideLoading();
                 document.getElementById('public-view').style.display = 'flex';
                 
             } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-                // Se falhar a rede mas tiver cache antigo, usa o cache como segurança
+                console.error("Erro detalhado:", error);
                 const fallbackCache = localStorage.getItem('center_sport_cache');
-                if (fallbackCache) {
-                    appData = JSON.parse(fallbackCache);
-                    applyColors();
-                    renderPublicView();
-                    hideLoading();
-                    document.getElementById('public-view').style.display = 'flex';
-                    showToast("Modo offline ativado (usando cache).");
-                } else {
-                    document.getElementById('loading-text').innerText = "Erro ao conectar com o banco de dados.";
-                }
+                appData = fallbackCache ? JSON.parse(fallbackCache) : defaultFallbackData;
+                
+                applyColors();
+                renderPublicView();
+                hideLoading();
+                document.getElementById('public-view').style.display = 'flex';
+                showToast("Modo offline ativado.");
             }
         }
 
         async function saveToSupabase(showAlert = true) {
             renderAdminView(); 
-
             try {
                 const { error } = await supabaseClient
                     .from('linktree_settings')
@@ -410,13 +381,12 @@
 
                 if (error) throw error;
 
-                // Atualiza o cache local imediatamente ao salvar
                 localStorage.setItem('center_sport_cache', JSON.stringify(appData));
                 localStorage.setItem('center_sport_time', new Date().getTime());
 
-                if (showAlert) showToast('Alterações salvas na nuvem com sucesso!');
+                if (showAlert) showToast('Salvo na nuvem com sucesso!');
             } catch (error) {
-                showToast("Erro ao salvar online: " + error.message);
+                showToast("Erro ao salvar online.");
             }
         }
 
@@ -428,15 +398,11 @@
             if (clickCount === 5) {
                 clickCount = 0;
                 showLoading("Verificando acesso...");
-                
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 hideLoading();
 
-                if (session) {
-                    openAdmin();
-                } else {
-                    document.getElementById('login-view').style.display = 'block';
-                }
+                if (session) { openAdmin(); } 
+                else { document.getElementById('login-view').style.display = 'block'; }
             }
         }
 
@@ -448,20 +414,11 @@
             if(!email || !pwd) return showToast("Preencha e-mail e senha.");
 
             btn.innerText = "Entrando...";
-            
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: pwd,
-            });
-
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pwd });
             btn.innerText = "Entrar";
 
-            if (error) {
-                showToast("E-mail ou Senha incorretos.");
-            } else {
-                document.getElementById('login-view').style.display = 'none';
-                openAdmin();
-            }
+            if (error) { showToast("E-mail ou Senha incorretos."); } 
+            else { document.getElementById('login-view').style.display = 'none'; openAdmin(); }
         }
 
         function closeLogin() { document.getElementById('login-view').style.display = 'none'; }
@@ -477,16 +434,10 @@
             const fileName = `${Math.random()}.${fileExt}`;
             const filePath = `${folderName}/${fileName}`;
 
-            const { data, error } = await supabaseClient.storage
-                .from('linktree_uploads')
-                .upload(filePath, file);
-
+            const { error } = await supabaseClient.storage.from('linktree_uploads').upload(filePath, file);
             if (error) throw error;
 
-            const { data: publicData } = supabaseClient.storage
-                .from('linktree_uploads')
-                .getPublicUrl(filePath);
-
+            const { data: publicData } = supabaseClient.storage.from('linktree_uploads').getPublicUrl(filePath);
             return publicData.publicUrl;
         }
 
@@ -499,18 +450,13 @@
 
             if (fileInput) {
                 showLoading("Enviando imagem...");
-                try {
-                    finalUrl = await uploadImage(fileInput, 'banners');
-                } catch (e) {
-                    hideLoading();
-                    return showToast("Erro ao enviar: " + e.message);
-                }
+                try { finalUrl = await uploadImage(fileInput, 'banners'); } 
+                catch (e) { hideLoading(); return showToast("Erro ao enviar: " + e.message); }
                 hideLoading();
             }
 
             if(!appData.banners) appData.banners = [];
             appData.banners.push(finalUrl);
-            
             document.getElementById('new-banner-file').value = '';
             document.getElementById('new-banner-url').value = '';
             saveToSupabase(false);
@@ -521,7 +467,6 @@
             const name = document.getElementById('new-seller-name').value;
             const role = document.getElementById('new-seller-role').value;
             const wa = document.getElementById('new-seller-wa').value;
-            
             const fileInput = document.getElementById('new-seller-file').files[0];
             const urlInput = document.getElementById('new-seller-photo').value;
             let photoUrl = urlInput;
@@ -530,12 +475,8 @@
 
             if (fileInput) {
                 showLoading("Enviando foto...");
-                try {
-                    photoUrl = await uploadImage(fileInput, 'sellers');
-                } catch (e) {
-                    hideLoading();
-                    return showToast("Erro ao enviar: " + e.message);
-                }
+                try { photoUrl = await uploadImage(fileInput, 'sellers'); } 
+                catch (e) { hideLoading(); return showToast("Erro ao enviar: " + e.message); }
                 hideLoading();
             }
 
