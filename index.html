@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Center Sport - Links</title>
+    <!-- Favicon Dinâmico -->
+    <link id="dynamic-favicon" rel="icon" type="image/x-icon" href="">
     <!-- Fonte Google -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Ícones FontAwesome -->
@@ -76,12 +78,11 @@
             background-color: var(--header-bg); color: white; padding: 15px 20px;
             display: flex; align-items: center; justify-content: center; user-select: none;
         }
-        .store-info-header { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .store-info-header { display: flex; align-items: center; gap: 12px; cursor: pointer; width: 100%; justify-content: center; padding: 5px; }
         .store-logo { width: 45px; height: 45px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; object-fit: cover; }
         .store-text h1 { font-size: 16px; font-weight: 600; }
         .store-text p { font-size: 11px; color: #9ca3af; }
 
-        /* Banner Redimensionado e Ajustado para 1200x600 (Aspect Ratio 2:1) com Toque/Arrastar */
         .banner-container { padding: 20px; text-align: center; }
         .banner-wrapper { 
             position: relative; width: 100%; border-radius: 15px; overflow: hidden; 
@@ -138,7 +139,6 @@
         .form-group label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: 600; color: #555; }
         .form-group input[type="text"], .form-group input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: white;}
         
-        /* Preview de cores no Admin */
         .color-row { display: flex; gap: 10px; align-items: center; }
         .color-preview { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #ccc; flex-shrink: 0; }
 
@@ -176,6 +176,7 @@
 
         <div id="public-view" style="display:none; flex-direction: column; min-height: 100vh;">
             <header>
+                <!-- Toque Secreto de 5 cliques melhorado -->
                 <div class="store-info-header" onclick="handleSecretClick()">
                     <div id="display-logo" class="store-logo">C</div>
                     <div class="store-text">
@@ -186,7 +187,6 @@
             </header>
 
             <div class="banner-container" id="banner-section">
-                <!-- Banner com suporte a toque/arrastar e clique lateral -->
                 <div class="banner-wrapper" id="banner-wrapper">
                     <img id="display-banner-img" src="" alt="Banner" class="banner-img">
                 </div>
@@ -221,7 +221,7 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-palette"></i> Aparência (Com Preview)</h3>
+                <h3><i class="fas fa-palette"></i> Aparência</h3>
                 <div class="color-grid">
                     <div class="form-group">
                         <label>Cor Primária (Hex):</label>
@@ -242,7 +242,7 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-store"></i> Loja & Logo</h3>
+                <h3><i class="fas fa-store"></i> Loja & Logos</h3>
                 <div class="form-group"><label>Nome da Loja:</label><input type="text" id="input-store-name"></div>
                 <div class="form-group"><label>Slogan:</label><input type="text" id="input-store-sub"></div>
                 
@@ -250,11 +250,18 @@
                 <div class="upload-or">OU</div>
                 <div class="form-group"><label>URL da Logo:</label><input type="text" id="input-store-logo"></div>
                 
+                <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
+                
+                <!-- Nova Opção de Favicon -->
+                <div class="form-group"><label>Favicon da Aba (Arquivo):</label><input type="file" id="new-favicon-file" accept="image/*"></div>
+                <div class="upload-or">OU</div>
+                <div class="form-group"><label>URL do Favicon:</label><input type="text" id="input-store-favicon" placeholder="http://..."></div>
+
                 <button class="btn-save" onclick="saveStoreInfo()">Salvar Loja</button>
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-images"></i> Banners (Reordenar)</h3>
+                <h3><i class="fas fa-images"></i> Banners</h3>
                 <div id="admin-banners-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <div class="form-group"><label>Arquivo do Banner (1200x600):</label><input type="file" id="new-banner-file" accept="image/*"></div>
@@ -264,7 +271,7 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-users"></i> Vendedores (Gerenciar)</h3>
+                <h3><i class="fas fa-users"></i> Vendedores</h3>
                 <div id="admin-sellers-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <input type="hidden" id="edit-seller-id" value="">
@@ -278,7 +285,7 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-link"></i> Links Extras (Reordenar & Editar)</h3>
+                <h3><i class="fas fa-link"></i> Links Extras</h3>
                 <div id="admin-links-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <input type="hidden" id="edit-link-id" value="">
@@ -305,13 +312,13 @@
         let appData = null;
         let carouselTimer = null;
         let currentBannerIdx = 0;
-        let clickCount = 0;
-        let clickTimer = null;
+        let secretClicks = 0;
+        let secretClickTimer = null;
         let modalCallback = null;
 
         const defaultFallbackData = {
             colors: { primary: "#16a34a", header: "#111111" },
-            store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "" },
+            store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "", faviconUrl: "" },
             banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"],
             sellers: [
                 { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
@@ -356,6 +363,38 @@
                 preview.style.backgroundColor = val;
             } else {
                 preview.style.backgroundColor = 'transparent';
+            }
+        }
+
+        // Lógica dos 5 Cliques Secretos
+        function handleSecretClick() {
+            secretClicks++;
+            if (secretClickTimer) clearTimeout(secretClickTimer);
+            
+            secretClickTimer = setTimeout(() => {
+                secretClicks = 0;
+            }, 2000);
+
+            if (secretClicks >= 5) {
+                secretClicks = 0;
+                clearTimeout(secretClickTimer);
+                checkAuthAndOpenAdmin();
+            }
+        }
+
+        async function checkAuthAndOpenAdmin() {
+            showLoading("Verificando acesso...");
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                hideLoading();
+                if (session) {
+                    openAdmin();
+                } else {
+                    document.getElementById('login-view').style.display = 'block';
+                }
+            } catch (e) {
+                hideLoading();
+                document.getElementById('login-view').style.display = 'block';
             }
         }
 
@@ -430,22 +469,6 @@
             }
         }
 
-        async function handleSecretClick() {
-            clickCount++;
-            if (clickTimer) clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => { clickCount = 0; }, 1500);
-            
-            if (clickCount === 5) {
-                clickCount = 0;
-                showLoading("Verificando acesso...");
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                hideLoading();
-
-                if (session) { openAdmin(); } 
-                else { document.getElementById('login-view').style.display = 'block'; }
-            }
-        }
-
         async function attemptLogin() {
             const email = document.getElementById('admin-email').value;
             const pwd = document.getElementById('admin-password').value;
@@ -481,7 +504,6 @@
             return publicData.publicUrl;
         }
 
-        // Redimensionador Automático para 1200x600 via Canvas
         async function resizeImageToStandard(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -512,7 +534,7 @@
             if (!fileInput && !urlInput) return showToast("Selecione um arquivo ou cole uma URL.");
 
             if (fileInput) {
-                showLoading("Processando e redimensionando banner...");
+                showLoading("Redimensionando banner...");
                 try {
                     const resizedFile = await resizeImageToStandard(fileInput);
                     finalUrl = await uploadImage(resizedFile, 'banners');
@@ -548,20 +570,35 @@
         async function saveStoreInfo() {
             const name = document.getElementById('input-store-name').value;
             const sub = document.getElementById('input-store-sub').value;
-            const fileInput = document.getElementById('new-logo-file').files[0];
+            
+            const logoFile = document.getElementById('new-logo-file').files[0];
             let logoUrl = document.getElementById('input-store-logo').value;
 
-            if (fileInput) {
+            const faviconFile = document.getElementById('new-favicon-file').files[0];
+            let faviconUrl = document.getElementById('input-store-favicon').value;
+
+            if (logoFile) {
                 showLoading("Enviando logo...");
-                try { logoUrl = await uploadImage(fileInput, 'logos'); }
-                catch (e) { hideLoading(); return showToast("Erro ao enviar logo: " + e.message); }
+                try { logoUrl = await uploadImage(logoFile, 'logos'); }
+                catch (e) { hideLoading(); return showToast("Erro na logo: " + e.message); }
+                hideLoading();
+            }
+
+            if (faviconFile) {
+                showLoading("Enviando favicon...");
+                try { faviconUrl = await uploadImage(faviconFile, 'favicons'); }
+                catch (e) { hideLoading(); return showToast("Erro no favicon: " + e.message); }
                 hideLoading();
             }
 
             appData.store.name = name;
             appData.store.subtitle = sub;
             appData.store.logoUrl = logoUrl;
+            appData.store.faviconUrl = faviconUrl;
+
             document.getElementById('new-logo-file').value = '';
+            document.getElementById('new-favicon-file').value = '';
+            
             saveToSupabase();
         }
 
@@ -583,7 +620,6 @@
             }
 
             if (id) {
-                // Editando
                 const seller = appData.sellers.find(s => s.id == id);
                 if (seller) {
                     seller.name = name;
@@ -593,13 +629,11 @@
                 }
                 showToast("Vendedor atualizado!");
             } else {
-                // Adicionando novo
                 const newId = appData.sellers.length > 0 ? Math.max(...appData.sellers.map(s => s.id)) + 1 : 1;
                 appData.sellers.push({ id: newId, name: name, role: role || 'Vendedor', whatsapp: wa.replace(/\D/g, ''), photoUrl: photoUrl });
                 showToast("Vendedor adicionado!");
             }
 
-            // Limpa form
             document.getElementById('edit-seller-id').value = '';
             document.getElementById('new-seller-name').value = '';
             document.getElementById('new-seller-role').value = 'Vendedor';
@@ -711,6 +745,13 @@
 
             document.getElementById('display-store-name').innerText = appData.store.name;
             document.getElementById('display-store-sub').innerText = appData.store.subtitle;
+            
+            // Aplica Favicon se existir
+            const favEl = document.getElementById('dynamic-favicon');
+            if (appData.store.faviconUrl) {
+                favEl.href = appData.store.faviconUrl;
+            }
+
             const logoDisplay = document.getElementById('display-logo');
             if (appData.store.logoUrl) logoDisplay.innerHTML = `<img src="${appData.store.logoUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
             else logoDisplay.innerHTML = appData.store.name.charAt(0).toUpperCase();
@@ -744,7 +785,6 @@
             });
         }
 
-        // Lógica Limpa de Carrossel com Toque (Swipe) e Cliques Laterais
         function initCarousel() {
             const imgEl = document.getElementById('display-banner-img');
             const dotsEl = document.getElementById('carousel-dots');
@@ -767,7 +807,6 @@
 
             updateCarousel();
 
-            // Interatividade de cliques laterais e Swipe com dedo
             let touchStartX = 0;
             wrapper.ontouchstart = (e) => { touchStartX = e.touches[0].clientX; };
             wrapper.ontouchend = (e) => {
@@ -799,6 +838,20 @@
             }
         }
 
+        function openAdmin() {
+            document.getElementById('public-view').style.display = 'none';
+            document.getElementById('admin-view').style.display = 'block';
+            if(carouselTimer) clearInterval(carouselTimer);
+            renderAdminView();
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-view').style.display = 'none';
+            document.getElementById('public-view').style.display = 'flex';
+            applyColors();
+            renderPublicView(); 
+        }
+
         function renderAdminView() {
             if(!appData) return;
             document.getElementById('input-color-primary').value = appData.colors.primary;
@@ -809,9 +862,9 @@
             document.getElementById('input-store-name').value = appData.store.name;
             document.getElementById('input-store-sub').value = appData.store.subtitle;
             document.getElementById('input-store-logo').value = appData.store.logoUrl || '';
+            document.getElementById('input-store-favicon').value = appData.store.faviconUrl || '';
             document.getElementById('input-footer-text').value = appData.footerText;
 
-            // Banners com setas para reordenar
             const bannersList = document.getElementById('admin-banners-list');
             bannersList.innerHTML = '';
             (appData.banners || []).forEach((url, index) => {
@@ -828,7 +881,6 @@
                     </div>`;
             });
 
-            // Vendedores com Botão Editar e Excluir
             const adminSellersList = document.getElementById('admin-sellers-list');
             adminSellersList.innerHTML = '';
             (appData.sellers || []).forEach(seller => {
@@ -842,7 +894,6 @@
                     </div>`;
             });
 
-            // Links com Reordenação e Edição
             const adminLinksList = document.getElementById('admin-links-list');
             adminLinksList.innerHTML = '';
             (appData.links || []).forEach((link, index) => {
