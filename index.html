@@ -305,9 +305,33 @@
     </div>
 
     <script>
-        const SUPABASE_PROJECT_URL = 'https://yklanebzjhweviqwfbbp.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrbGFuZWJ6amh3ZXZpcXdmYmJwIiwicm9sZSI6InFub24iLCJpYXQiOjE3ODY5MzUyMTksImV4cCI6MjEwMjUxMTIxOX0.icfWsyf2Q_v-R-__pUO_-Ncqyq6olaivNrXwdRavvIY';
-        
+        const DEFAULT_SUPABASE_PROJECT_URL = 'https://yklanebzjhweviqwfbbp.supabase.co';
+        const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_F4Qu_vbE--MHjoVA2oRYDA_Kxb2Pq7Z';
+        const STORAGE_KEYS = {
+            supabaseUrl: 'center_sport_supabase_url',
+            supabaseAnonKey: 'center_sport_supabase_key'
+        };
+
+        function getSupabaseConfig() {
+            const params = new URLSearchParams(window.location.search);
+            const queryUrl = params.get('supabase_url');
+            const queryKey = params.get('supabase_anon_key');
+
+            return {
+                url: queryUrl || localStorage.getItem(STORAGE_KEYS.supabaseUrl) || DEFAULT_SUPABASE_PROJECT_URL,
+                anonKey: queryKey || localStorage.getItem(STORAGE_KEYS.supabaseAnonKey) || DEFAULT_SUPABASE_ANON_KEY
+            };
+        }
+
+        function initSupabaseClient() {
+            const config = getSupabaseConfig();
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(config.url, config.anonKey);
+                return true;
+            }
+            return false;
+        }
+
         let supabaseClient = null;
         let appData = null;
         let carouselTimer = null;
@@ -385,6 +409,9 @@
         async function checkAuthAndOpenAdmin() {
             showLoading("Verificando acesso...");
             try {
+                if (!supabaseClient && !initSupabaseClient()) {
+                    throw new Error('SDK do Supabase indisponível.');
+                }
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 hideLoading();
                 if (session) {
@@ -395,14 +422,13 @@
             } catch (e) {
                 hideLoading();
                 document.getElementById('login-view').style.display = 'block';
+                console.error('Erro ao verificar autenticação:', e);
             }
         }
 
         async function fetchAppData() {
             try {
-                if (window.supabase && window.supabase.createClient) {
-                    supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
-                } else {
+                if (!initSupabaseClient()) {
                     throw new Error("SDK do Supabase indisponível.");
                 }
 
@@ -470,18 +496,43 @@
         }
 
         async function attemptLogin() {
-            const email = document.getElementById('admin-email').value;
+            const email = document.getElementById('admin-email').value.trim().toLowerCase();
             const pwd = document.getElementById('admin-password').value;
             const btn = document.getElementById('btn-login');
 
             if(!email || !pwd) return showToast("Preencha e-mail e senha.");
 
-            btn.innerText = "Entrando...";
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pwd });
-            btn.innerText = "Entrar";
+            if (!supabaseClient && !initSupabaseClient()) {
+                return showToast("Não foi possível conectar ao Supabase.");
+            }
 
-            if (error) { showToast("E-mail ou Senha incorretos."); } 
-            else { document.getElementById('login-view').style.display = 'none'; openAdmin(); }
+            btn.innerText = "Entrando...";
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pwd });
+                btn.innerText = "Entrar";
+
+                if (error) {
+                    const msg = (error.message || '').toLowerCase();
+                    const isProjectMismatch = msg.includes('invalid login credentials') || msg.includes('user not found') || msg.includes('email not confirmed');
+                    showToast(isProjectMismatch
+                        ? 'Credenciais inválidas para este projeto do Supabase. Verifique a URL/chave do painel e a conta correta.'
+                        : 'E-mail ou Senha incorretos.');
+                    console.error('Erro de login do Supabase:', error);
+                    return;
+                }
+
+                if (!data?.session) {
+                    showToast('Não foi possível iniciar a sessão do painel.');
+                    return;
+                }
+
+                document.getElementById('login-view').style.display = 'none';
+                openAdmin();
+            } catch (error) {
+                btn.innerText = "Entrar";
+                console.error('Exceção no login:', error);
+                showToast('Erro ao tentar entrar no painel.');
+            }
         }
 
         function closeLogin() { document.getElementById('login-view').style.display = 'none'; }
