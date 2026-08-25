@@ -238,11 +238,14 @@
             position: relative; width: 100%;
             padding: 14px 15px; margin-bottom: 15px;
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            cursor: pointer; transition: transform 0.1s ease;
+            cursor: pointer; transition: transform 0.1s ease, filter 0.2s ease;
             border-radius: 12px;
             display: flex; align-items: center; justify-content: space-between; gap: 12px;
         }
         .coupon-banner:active { transform: scale(0.98); }
+        .coupon-banner.coupon-rescued {
+            border: 2px dashed rgba(255,255,255,0.7);
+        }
         .coupon-banner-text { 
             font-size: 13px; font-weight: 600; text-align: center;
             line-height: 1.4; flex-grow: 1; 
@@ -464,12 +467,15 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-share-nodes"></i> Redes Sociais</h3>
+                <h3><i class="fas fa-share-nodes"></i> Redes Sociais & WhatsApp Geral</h3>
                 <div id="admin-socials-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <input type="hidden" id="edit-social-id" value="">
-                <div class="form-group"><label>URL da rede social:</label><input type="text" id="new-social-url" placeholder="https://instagram.com/..."></div>
-                <button class="btn-add" id="btn-social-action" onclick="saveSocial()">+ Adicionar Rede Social</button>
+                <div class="form-group">
+                    <label>URL ou Contato (Instagram, TikTok, YouTube, WhatsApp: número, grupo ou canal):</label>
+                    <input type="text" id="new-social-url" placeholder="Ex: https://wa.me/5511999999999 ou https://chat.whatsapp.com/...">
+                </div>
+                <button class="btn-add" id="btn-social-action" onclick="saveSocial()">+ Adicionar Link Social</button>
             </div>
 
             <div class="admin-section">
@@ -503,7 +509,8 @@
             supabaseAnonKey: 'center_sport_supabase_key',
             cache: 'center_sport_cache',
             cacheTime: 'center_sport_time',
-            forceRefresh: 'center_sport_force_refresh'
+            forceRefresh: 'center_sport_force_refresh',
+            rescuedCoupon: 'center_sport_rescued_coupon'
         };
 
         function getSupabaseConfig() {
@@ -653,10 +660,9 @@
             }
         }
 
-        /* Determina se o vendedor está online com base no horário atual */
         function isSellerOnline(seller) {
             if (!seller.intervals || !Array.isArray(seller.intervals) || seller.intervals.length === 0) {
-                return true; // Se nenhum horário foi adicionado, fica online 24h
+                return true;
             }
 
             const now = new Date();
@@ -672,7 +678,6 @@
                 if (startMin <= endMin) {
                     return currentMinutes >= startMin && currentMinutes <= endMin;
                 } else {
-                    // Turno que passa da meia-noite (ex: 22:00 até 02:00)
                     return currentMinutes >= startMin || currentMinutes <= endMin;
                 }
             });
@@ -1045,7 +1050,6 @@
             image.src = sellerCropState.imageUrl;
         }
 
-        /* Gerenciamento dinâmico de Intervalos de Horários */
         function renderSellerIntervalsUI() {
             const container = document.getElementById('seller-intervals-container');
             if (!container) return;
@@ -1183,34 +1187,54 @@
             showToast("Banner Promocional Salvo!");
         }
 
+        function formatSocialUrl(url, platform) {
+            let clean = url.trim();
+            if (platform === 'whatsapp') {
+                const onlyNumbers = clean.replace(/\D/g, '');
+                if (/^\d{8,15}$/.test(onlyNumbers) && !clean.includes('whatsapp.com') && !clean.includes('wa.me')) {
+                    return `https://wa.me/${onlyNumbers}`;
+                }
+                if (!clean.startsWith('http://') && !clean.startsWith('https://') && !clean.startsWith('whatsapp://')) {
+                    return `https://${clean}`;
+                }
+                return clean;
+            }
+            if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+                return `https://${clean}`;
+            }
+            return clean;
+        }
+
         async function saveSocial() {
             const id = document.getElementById('edit-social-id').value;
-            const url = document.getElementById('new-social-url').value.trim();
+            const inputUrl = document.getElementById('new-social-url').value.trim();
 
-            if (!url) return showToast('Informe a URL da rede social.');
+            if (!inputUrl) return showToast('Informe a URL ou número.');
 
-            const platform = detectSocialPlatform(url);
+            const platform = detectSocialPlatform(inputUrl);
             if (!platform) {
-                return showToast('URL não reconhecida. Use Instagram, Facebook, TikTok, YouTube ou Twitter/X.');
+                return showToast('Formato não reconhecido. Use WhatsApp, Instagram, Facebook, TikTok, YouTube ou Twitter.');
             }
+
+            const formattedUrl = formatSocialUrl(inputUrl, platform);
 
             if (id) {
                 const social = (appData.socialLinks || []).find(item => item.id == id);
                 if (social) {
-                    social.url = url;
+                    social.url = formattedUrl;
                     social.platform = platform;
                 }
-                showToast('Rede social atualizada!');
+                showToast('Link atualizado!');
             } else {
                 const newId = (appData.socialLinks || []).length > 0 ? Math.max(...(appData.socialLinks || []).map(item => item.id)) + 1 : 1;
                 appData.socialLinks = appData.socialLinks || [];
-                appData.socialLinks.push({ id: newId, platform, url });
-                showToast('Rede social adicionada!');
+                appData.socialLinks.push({ id: newId, platform, url: formattedUrl });
+                showToast('Link adicionado!');
             }
 
             document.getElementById('edit-social-id').value = '';
             document.getElementById('new-social-url').value = '';
-            document.getElementById('btn-social-action').innerText = "+ Adicionar Rede Social";
+            document.getElementById('btn-social-action').innerText = "+ Adicionar Link Social";
 
             renderAdminView();
             saveToSupabase(false);
@@ -1234,12 +1258,12 @@
         }
 
         function deleteSocial(id) {
-            showConfirm('Excluir rede social', 'Deseja remover este ícone?', (res) => {
+            showConfirm('Excluir link', 'Deseja remover este link social?', (res) => {
                 if (res) {
                     appData.socialLinks = (appData.socialLinks || []).filter(item => item.id !== id);
                     renderAdminView();
                     saveToSupabase(false);
-                    showToast('Rede social removida.');
+                    showToast('Link removido.');
                 }
             });
         }
@@ -1341,17 +1365,19 @@
 
         function getSocialPlatformLabel(platform) {
             const labels = {
+                whatsapp: 'WhatsApp',
                 instagram: 'Instagram',
                 facebook: 'Facebook',
                 tiktok: 'TikTok',
                 youtube: 'YouTube',
                 twitter: 'Twitter (X)'
             };
-            return labels[platform] || 'Rede social';
+            return labels[platform] || 'Link';
         }
 
         function getSocialPlatformInfo(platform) {
             const config = {
+                whatsapp: { icon: 'fa-brands fa-whatsapp', label: 'WhatsApp' },
                 instagram: { icon: 'fa-brands fa-instagram', label: 'Instagram' },
                 facebook: { icon: 'fa-brands fa-facebook-f', label: 'Facebook' },
                 tiktok: { icon: 'fa-brands fa-tiktok', label: 'TikTok' },
@@ -1365,15 +1391,22 @@
             if (!url) return null;
             try {
                 const value = url.trim();
-                const parsed = new URL(value.startsWith('http') ? value : `https://${value}`);
+                const onlyNums = value.replace(/\D/g, '');
+                if (/^\d{8,15}$/.test(onlyNums) && !value.includes('.')) {
+                    return 'whatsapp';
+                }
+
+                const parsed = new URL(value.startsWith('http://') || value.startsWith('https://') || value.startsWith('whatsapp://') ? value : `https://${value}`);
                 const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
 
+                if (host.includes('wa.me') || host.includes('whatsapp.com') || parsed.protocol === 'whatsapp:') return 'whatsapp';
                 if (host.includes('instagram.com')) return 'instagram';
                 if (host.includes('facebook.com') || host.includes('fb.com')) return 'facebook';
                 if (host.includes('tiktok.com')) return 'tiktok';
                 if (host.includes('youtube.com') || host.includes('youtu.be')) return 'youtube';
                 if (host.includes('twitter.com') || host.includes('x.com')) return 'twitter';
             } catch (error) {
+                if (/wa\.me|whatsapp|chat\.whatsapp/i.test(url)) return 'whatsapp';
                 return null;
             }
             return null;
@@ -1406,11 +1439,22 @@
             return base;
         }
 
+        function isCouponRescued(code) {
+            if (!code) return false;
+            return localStorage.getItem(STORAGE_KEYS.rescuedCoupon) === code;
+        }
+
         function resgatarCupom(code) {
+            if (!code) return;
+            localStorage.setItem(STORAGE_KEYS.rescuedCoupon, code);
+            
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(code).catch(() => {});
             }
-            showToast("Cupom resgatado! Escolha um vendedor abaixo.");
+            
+            showToast("Cupom ativado com sucesso! Escolha um vendedor abaixo.");
+            renderPublicView();
+
             const sellerSection = document.querySelector('.sellers-section');
             if (sellerSection) {
                 sellerSection.scrollIntoView({ behavior: 'smooth' });
@@ -1467,18 +1511,38 @@
             // Renderizar Banner de Cupom
             const couponContainer = document.getElementById('coupon-banner-container');
             couponContainer.innerHTML = '';
-            if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
+            
+            const couponActive = appData.coupon && appData.coupon.enabled && appData.coupon.code;
+            const userRescued = couponActive && isCouponRescued(appData.coupon.code);
+
+            if (couponActive) {
                 const primaryColor = appData.colors.primary || '#16a34a';
                 const headerColor = appData.colors.header || '#111111';
-                couponContainer.innerHTML = `
-                    <div class="coupon-banner" style="background-color: ${primaryColor};" onclick="resgatarCupom('${appData.coupon.code}')">
-                        <span class="coupon-banner-text" style="color: ${headerColor};">${appData.coupon.text || 'Cupom Especial'}</span>
-                        <div class="coupon-code-wrapper">
-                            <div class="coupon-banner-title-inside" style="color: ${headerColor};">Pegue o seu Cupom!</div>
-                            <div class="coupon-banner-code" style="background-color: ${headerColor}; color: ${primaryColor};">${appData.coupon.code}</div>
+                
+                if (userRescued) {
+                    couponContainer.innerHTML = `
+                        <div class="coupon-banner coupon-rescued" style="background-color: ${primaryColor};" onclick="resgatarCupom('${appData.coupon.code}')">
+                            <span class="coupon-banner-text" style="color: ${headerColor};">
+                                <i class="fas fa-check-circle"></i> <strong>Cupom Ativado!</strong><br>
+                                <small style="font-weight: normal; opacity: 0.9;">${appData.coupon.text || 'Desconto aplicado no WhatsApp'}</small>
+                            </span>
+                            <div class="coupon-code-wrapper">
+                                <div class="coupon-banner-title-inside" style="color: ${headerColor};">Resgatado ✅</div>
+                                <div class="coupon-banner-code" style="background-color: ${headerColor}; color: ${primaryColor};"><i class="fas fa-check"></i> ${appData.coupon.code}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    couponContainer.innerHTML = `
+                        <div class="coupon-banner" style="background-color: ${primaryColor};" onclick="resgatarCupom('${appData.coupon.code}')">
+                            <span class="coupon-banner-text" style="color: ${headerColor};">${appData.coupon.text || 'Cupom Especial'}</span>
+                            <div class="coupon-code-wrapper">
+                                <div class="coupon-banner-title-inside" style="color: ${headerColor};">Pegue o seu Cupom!</div>
+                                <div class="coupon-banner-code" style="background-color: ${headerColor}; color: ${primaryColor};">${appData.coupon.code}</div>
+                            </div>
+                        </div>
+                    `;
+                }
             }
 
             // Renderizar Banner Promocional Secundário
@@ -1515,10 +1579,10 @@
                 const isOnline = isSellerOnline(seller);
                 let linkWA = `https://wa.me/${seller.whatsapp}`;
                 
-                // Mensagem personalizada sempre com o nome do vendedor
                 let defaultMsg = `Olá, ${seller.name}! Vim através do site e gostaria de atendimento.`;
-                if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
-                    defaultMsg = `Olá, ${seller.name}! Vim pelo site e quero usar o cupom: *${appData.coupon.code}*`;
+                // Só inclui o cupom na mensagem se o cliente tiver de fato resgatado o cupom
+                if (userRescued) {
+                    defaultMsg = `Olá, ${seller.name}! Vim pelo site e resgatei o cupom: *${appData.coupon.code}*`;
                 }
                 linkWA += `?text=${encodeURIComponent(defaultMsg)}`;
 
@@ -1683,7 +1747,7 @@
             if (!socialLinks.length) {
                 adminSocialsList.innerHTML = `
                     <div class="admin-item-list">
-                        <div><strong>Sem redes sociais</strong><br><small>Adicione uma URL para que o ícone apareça na página pública.</small></div>
+                        <div><strong>Sem links sociais cadastrados</strong><br><small>Adicione seu WhatsApp, Instagram ou outras redes.</small></div>
                     </div>`;
             } else {
                 socialLinks.forEach((social, index) => {
