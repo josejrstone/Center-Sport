@@ -102,6 +102,15 @@
         .dot { width: 8px; height: 8px; background-color: #d1d5db; border-radius: 50%; transition: all 0.3s; }
         .dot.active { background-color: var(--primary-color); width: 20px; border-radius: 4px; }
 
+        /* Banner Promocional Secundário */
+        .secondary-promo-banner {
+            width: 100%; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: block;
+            margin-bottom: 15px; transition: transform 0.15s ease;
+        }
+        .secondary-promo-banner:active { transform: scale(0.98); }
+        .secondary-promo-banner img { width: 100%; height: auto; display: block; object-fit: cover; }
+
         .sellers-section { padding: 0 20px 20px 20px; }
         .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
         .section-title::before { content: ''; display: block; width: 4px; height: 24px; background-color: var(--primary-color); border-radius: 2px; }
@@ -110,13 +119,33 @@
         
         .sellers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
         
-        .seller-card { border: 1px solid rgba(0,0,0,0.05); background-color: white; border-radius: 15px; padding: 15px 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02); position: relative; }
-        .seller-photo-container { position: relative; width: 70px; height: 70px; margin: 0 auto 10px auto; }
+        .seller-card { 
+            border: 1px solid rgba(0,0,0,0.05); background-color: white; 
+            border-radius: 15px; padding: 15px 10px; text-align: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02); position: relative; 
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        
+        /* Badge de Online / Offline */
+        .seller-status-badge {
+            position: absolute; top: 10px; right: 10px;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .seller-status-badge.online { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .seller-status-badge.offline { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .status-dot-indicator { width: 6px; height: 6px; border-radius: 50%; }
+        .status-dot-indicator.online { background-color: #22c55e; box-shadow: 0 0 5px #22c55e; }
+        .status-dot-indicator.offline { background-color: #ef4444; }
+
+        .seller-photo-container { position: relative; width: 70px; height: 70px; margin: 10px auto 10px auto; }
         .seller-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--app-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .seller-whatsapp-badge { position: absolute; bottom: 0; right: -5px; background-color: #25d366; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid #fff; }
         .seller-name { font-size: 14px; font-weight: 600; color: var(--text-dark); }
         .seller-role { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
         .btn-whatsapp { display: block; background-color: var(--primary-color); color: var(--header-bg); text-decoration: none; padding: 8px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
+        .btn-whatsapp.btn-offline { background-color: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
 
         .extra-links-section { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
         .link-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
@@ -141,7 +170,7 @@
         .admin-section h3 { font-size: 16px; margin-bottom: 15px; color: #111; display: flex; align-items: center; gap: 8px; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: 600; color: #555; }
-        .form-group input[type="text"], .form-group input[type="file"], .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: white; font-family: 'Poppins', sans-serif;}
+        .form-group input[type="text"], .form-group input[type="file"], .form-group input[type="time"], .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: white; font-family: 'Poppins', sans-serif;}
         
         .color-row { display: flex; gap: 10px; align-items: center; }
         .color-preview { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #ccc; flex-shrink: 0; }
@@ -155,6 +184,11 @@
         .btn-action { background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
         .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
         .upload-or { text-align: center; font-size: 12px; color: #888; margin: 8px 0; font-weight: bold;}
+
+        /* Intervalos de Horários Admin */
+        .interval-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .interval-row input[type="time"] { padding: 6px 8px; font-size: 13px; }
+        .btn-remove-interval { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; border-radius: 4px; padding: 6px 10px; cursor: pointer; }
 
         #seller-crop-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -200,7 +234,6 @@
         .sync-dot.syncing { background: #f59e0b; }
         .sync-dot.offline { background: #ef4444; }
 
-        /* Cupom Banner Animado e Clicável - Ajustado para layout lado a lado */
         .coupon-banner {
             position: relative; width: 100%;
             padding: 14px 15px; margin-bottom: 15px;
@@ -209,11 +242,9 @@
             border-radius: 12px;
             display: flex; align-items: center; justify-content: space-between; gap: 12px;
         }
-        .coupon-banner:active {
-            transform: scale(0.98);
-        }
+        .coupon-banner:active { transform: scale(0.98); }
         .coupon-banner-text { 
-            font-size: 13px; font-weight: 600; text-align: center; /* Alinhamento centralizado adicionado aqui */
+            font-size: 13px; font-weight: 600; text-align: center;
             line-height: 1.4; flex-grow: 1; 
         }
         .coupon-code-wrapper {
@@ -273,8 +304,11 @@
                 <div class="carousel-dots" id="carousel-dots"></div>
             </div>
 
-            <!-- Div Onde o Banner do Cupom será Renderizado -->
+            <!-- Banner do Cupom -->
             <div id="coupon-banner-container" style="padding: 0 20px;"></div>
+
+            <!-- Banner Promocional Secundário Clicável -->
+            <div id="secondary-banner-container" style="padding: 0 20px;"></div>
 
             <section class="sellers-section">
                 <div class="section-title"><h2>Fale com nossos vendedores</h2></div>
@@ -369,7 +403,7 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-images"></i> Banners</h3>
+                <h3><i class="fas fa-images"></i> Banners Principais (Carrossel)</h3>
                 <div id="admin-banners-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <div class="form-group"><label>Arquivo do Banner (1200x600):</label><input type="file" id="new-banner-file" accept="image/*"></div>
@@ -379,17 +413,54 @@
             </div>
 
             <div class="admin-section">
-                <h3><i class="fas fa-users"></i> Vendedores</h3>
+                <h3><i class="fas fa-users"></i> Vendedores & Horários</h3>
                 <div id="admin-sellers-list"></div>
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <input type="hidden" id="edit-seller-id" value="">
                 <div class="form-group"><label>Nome:</label><input type="text" id="new-seller-name"></div>
                 <div class="form-group"><label>Cargo:</label><input type="text" id="new-seller-role" value="Vendedor"></div>
                 <div class="form-group"><label>WhatsApp (só números):</label><input type="text" id="new-seller-wa" placeholder="5511999999999"></div>
-                <div class="form-group"><label>Foto (Arquivo):</label><input type="file" id="new-seller-file" accept="image/*" onchange="if (this.files && this.files[0]) openSellerCrop(this.files[0]);"></div>
+                
+                <!-- Horários e Intervalos do Vendedor -->
+                <div class="form-group">
+                    <label>⏰ Horários em que estará Online (Intervalos):</label>
+                    <p style="font-size: 11px; color: #777; margin-bottom: 6px;">Adicione um ou mais turnos. Se vazio, ficará online 24h.</p>
+                    <div id="seller-intervals-container"></div>
+                    <button type="button" class="btn-action" style="background:#4b5563; font-size:12px; margin-top:4px;" onclick="addSellerIntervalRow()">+ Adicionar Intervalo de Horário</button>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;"><label>Foto (Arquivo):</label><input type="file" id="new-seller-file" accept="image/*" onchange="if (this.files && this.files[0]) openSellerCrop(this.files[0]);"></div>
                 <div class="upload-or">OU</div>
                 <div class="form-group"><label>URL da Foto:</label><input type="text" id="new-seller-photo" placeholder="http://..."></div>
                 <button class="btn-add" id="btn-seller-action" onclick="saveSeller()">+ Adicionar Vendedor</button>
+            </div>
+
+            <div class="admin-section">
+                <h3><i class="fas fa-ticket"></i> Cupom Promocional</h3>
+                <div class="form-group">
+                    <label>Ativar Cupom?</label>
+                    <input type="checkbox" id="coupon-enabled" style="width:20px; height:20px; cursor:pointer;">
+                </div>
+                <div class="form-group">
+                    <label>Texto do Cupom:</label>
+                    <input type="text" id="input-coupon-text" placeholder="Ex: Aproveite nossos descontos especiais!">
+                </div>
+                <div class="form-group">
+                    <label>Código do Cupom:</label>
+                    <input type="text" id="input-coupon-code" placeholder="Ex: CENTERSPORT2024" style="text-transform: uppercase;">
+                </div>
+                <button class="btn-save" onclick="saveCoupon()">Salvar Cupom</button>
+            </div>
+
+            <!-- Banner Promocional Secundário -->
+            <div class="admin-section">
+                <h3><i class="fas fa-image"></i> Banner Promocional Secundário (Abaixo do Cupom)</h3>
+                <p style="font-size:12px; color:#777; margin-bottom:12px;">Se não cadastrar imagem, o banner ficará oculto automaticamente.</p>
+                <div class="form-group"><label>Upload Imagem do Banner:</label><input type="file" id="secondary-banner-file" accept="image/*"></div>
+                <div class="upload-or">OU</div>
+                <div class="form-group"><label>URL da Imagem:</label><input type="text" id="secondary-banner-img-url" placeholder="https://..."></div>
+                <div class="form-group"><label>Link de Destino (Clique):</label><input type="text" id="secondary-banner-target-url" placeholder="https://exemplo.com.br/promocao"></div>
+                <button class="btn-save" onclick="saveSecondaryBanner()">Salvar Banner Promocional</button>
             </div>
 
             <div class="admin-section">
@@ -409,24 +480,6 @@
                 <div class="form-group"><label>Título:</label><input type="text" id="new-link-title"></div>
                 <div class="form-group"><label>URL:</label><input type="text" id="new-link-url"></div>
                 <button class="btn-add" id="btn-link-action" onclick="saveLink()">+ Adicionar Link</button>
-            </div>
-
-            <div class="admin-section">
-                <h3><i class="fas fa-ticket"></i> Cupom Promocional</h3>
-                <div class="form-group">
-                    <label>Ativar Cupom?</label>
-                    <input type="checkbox" id="coupon-enabled" style="width:20px; height:20px; cursor:pointer;">
-                </div>
-                <div class="form-group">
-                    <label>Texto do Cupom:</label>
-                    <input type="text" id="input-coupon-text" placeholder="Ex: Aproveite nossos descontos especiais!">
-                </div>
-                <div class="form-group">
-                    <label>Código do Cupom:</label>
-                    <input type="text" id="input-coupon-code" placeholder="Ex: CENTERSPORT2024" style="text-transform: uppercase;">
-                </div>
-                <p style="font-size:12px; color:#888; margin-top:10px;">💡 O banner usa gradiente automático com as cores da aparência (Primária + Topo)</p>
-                <button class="btn-save" onclick="saveCoupon()">Salvar Cupom</button>
             </div>
 
             <div class="admin-section" style="margin-bottom: 50px;">
@@ -482,14 +535,23 @@
         let modalCallback = null;
         let sellerCropState = { file: null, imageUrl: '', zoom: 1, offsetX: 0, offsetY: 0 };
         let sellerPendingCropFile = null;
+        let currentSellerIntervals = [];
 
         const defaultFallbackData = {
             colors: { primary: "#16a34a", header: "#111111" },
             store: { name: "Center Sport", subtitle: "As melhores promoções da cidade", logoUrl: "", faviconUrl: "", mapsUrl: "" },
             banners: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"],
             coupon: { enabled: false, text: "Aproveite nossos descontos especiais!", code: "CENTERSPORT2024" },
+            secondaryBanner: { imageUrl: "", linkUrl: "" },
             sellers: [
-                { id: 1, name: "Carlos Silva", role: "Vendedor", whatsapp: "5511999999999", photoUrl: "https://randomuser.me/api/portraits/men/32.jpg" }
+                { 
+                    id: 1, 
+                    name: "Carlos Silva", 
+                    role: "Vendedor", 
+                    whatsapp: "5511999999999", 
+                    photoUrl: "https://randomuser.me/api/portraits/men/32.jpg",
+                    intervals: [{ start: "08:00", end: "18:00" }]
+                }
             ],
             socialLinks: [
                 { id: 1, platform: "instagram", url: "https://instagram.com/centersport" },
@@ -589,6 +651,31 @@
                 document.getElementById('login-view').style.display = 'block';
                 console.error('Erro ao verificar autenticação:', e);
             }
+        }
+
+        /* Determina se o vendedor está online com base no horário atual */
+        function isSellerOnline(seller) {
+            if (!seller.intervals || !Array.isArray(seller.intervals) || seller.intervals.length === 0) {
+                return true; // Se nenhum horário foi adicionado, fica online 24h
+            }
+
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            return seller.intervals.some(interval => {
+                if (!interval.start || !interval.end) return false;
+                const [startH, startM] = interval.start.split(':').map(Number);
+                const [endH, endM] = interval.end.split(':').map(Number);
+                const startMin = startH * 60 + startM;
+                const endMin = endH * 60 + endM;
+
+                if (startMin <= endMin) {
+                    return currentMinutes >= startMin && currentMinutes <= endMin;
+                } else {
+                    // Turno que passa da meia-noite (ex: 22:00 até 02:00)
+                    return currentMinutes >= startMin || currentMinutes <= endMin;
+                }
+            });
         }
 
         async function fetchAppData({ forceRemote = false } = {}) {
@@ -696,17 +783,13 @@
                 btn.innerText = "Entrar";
 
                 if (error) {
-                    const msg = (error.message || '').toLowerCase();
-                    const isProjectMismatch = msg.includes('invalid login credentials') || msg.includes('user not found') || msg.includes('email not confirmed');
-                    showToast(isProjectMismatch
-                        ? 'Credenciais inválidas para este projeto do Supabase. Verifique a URL/chave do painel e a conta correta.'
-                        : 'E-mail ou Senha incorretos.');
+                    showToast('E-mail ou Senha incorretos.');
                     console.error('Erro de login do Supabase:', error);
                     return;
                 }
 
                 if (!data?.session) {
-                    showToast('Não foi possível iniciar a sessão do painel.');
+                    showToast('Não foi possível iniciar a sessão.');
                     return;
                 }
 
@@ -846,9 +929,7 @@
             saveToSupabase();
         }
 
-        function clamp(value, min, max) {
-            return Math.min(Math.max(value, min), max);
-        }
+        function clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
 
         function setupSellerCropInteractions() {
             const stage = document.getElementById('seller-crop-stage');
@@ -964,6 +1045,35 @@
             image.src = sellerCropState.imageUrl;
         }
 
+        /* Gerenciamento dinâmico de Intervalos de Horários */
+        function renderSellerIntervalsUI() {
+            const container = document.getElementById('seller-intervals-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            currentSellerIntervals.forEach((interval, idx) => {
+                const row = document.createElement('div');
+                row.className = 'interval-row';
+                row.innerHTML = `
+                    <input type="time" value="${interval.start || ''}" onchange="currentSellerIntervals[${idx}].start = this.value">
+                    <span style="font-size:12px; color:#666;">até</span>
+                    <input type="time" value="${interval.end || ''}" onchange="currentSellerIntervals[${idx}].end = this.value">
+                    <button type="button" class="btn-remove-interval" onclick="removeSellerIntervalRow(${idx})"><i class="fas fa-trash"></i></button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addSellerIntervalRow() {
+            currentSellerIntervals.push({ start: "08:00", end: "18:00" });
+            renderSellerIntervalsUI();
+        }
+
+        function removeSellerIntervalRow(idx) {
+            currentSellerIntervals.splice(idx, 1);
+            renderSellerIntervalsUI();
+        }
+
         async function saveSeller() {
             const id = document.getElementById('edit-seller-id').value;
             const name = document.getElementById('new-seller-name').value;
@@ -983,21 +1093,37 @@
                 hideLoading();
             }
 
+            const cleanIntervals = currentSellerIntervals.filter(i => i.start && i.end);
+
             if (id) {
                 const seller = appData.sellers.find(s => s.id == id);
                 if (seller) {
                     seller.name = name;
                     seller.role = role;
                     seller.whatsapp = wa.replace(/\D/g, '');
+                    seller.intervals = cleanIntervals;
                     if (photoUrl) seller.photoUrl = photoUrl;
                 }
                 showToast("Vendedor atualizado!");
             } else {
                 const newId = appData.sellers.length > 0 ? Math.max(...appData.sellers.map(s => s.id)) + 1 : 1;
-                appData.sellers.push({ id: newId, name: name, role: role || 'Vendedor', whatsapp: wa.replace(/\D/g, ''), photoUrl: photoUrl });
+                appData.sellers.push({
+                    id: newId,
+                    name: name,
+                    role: role || 'Vendedor',
+                    whatsapp: wa.replace(/\D/g, ''),
+                    photoUrl: photoUrl,
+                    intervals: cleanIntervals
+                });
                 showToast("Vendedor adicionado!");
             }
 
+            resetSellerForm();
+            renderAdminView();
+            saveToSupabase(false);
+        }
+
+        function resetSellerForm() {
             document.getElementById('edit-seller-id').value = '';
             document.getElementById('new-seller-name').value = '';
             document.getElementById('new-seller-role').value = 'Vendedor';
@@ -1006,9 +1132,8 @@
             document.getElementById('new-seller-photo').value = '';
             document.getElementById('btn-seller-action').innerText = "+ Adicionar Vendedor";
             sellerPendingCropFile = null;
-            
-            renderAdminView();
-            saveToSupabase(false);
+            currentSellerIntervals = [];
+            renderSellerIntervalsUI();
         }
 
         function editSeller(id) {
@@ -1019,6 +1144,8 @@
             document.getElementById('new-seller-role').value = s.role;
             document.getElementById('new-seller-wa').value = s.whatsapp;
             document.getElementById('new-seller-photo').value = s.photoUrl || '';
+            currentSellerIntervals = (s.intervals && Array.isArray(s.intervals)) ? JSON.parse(JSON.stringify(s.intervals)) : [];
+            renderSellerIntervalsUI();
             document.getElementById('btn-seller-action').innerText = "💾 Salvar Alterações";
         }
 
@@ -1031,6 +1158,29 @@
                     showToast("Vendedor removido.");
                 }
             });
+        }
+
+        async function saveSecondaryBanner() {
+            const fileInput = document.getElementById('secondary-banner-file').files[0];
+            let imageUrl = document.getElementById('secondary-banner-img-url').value.trim();
+            const linkUrl = document.getElementById('secondary-banner-target-url').value.trim();
+
+            if (fileInput) {
+                showLoading("Enviando banner promocional...");
+                try {
+                    imageUrl = await uploadImage(fileInput, 'promo_banners');
+                } catch (e) {
+                    hideLoading();
+                    return showToast("Erro no banner: " + e.message);
+                }
+                hideLoading();
+            }
+
+            appData.secondaryBanner = { imageUrl, linkUrl };
+            document.getElementById('secondary-banner-file').value = '';
+            renderAdminView();
+            saveToSupabase();
+            showToast("Banner Promocional Salvo!");
         }
 
         async function saveSocial() {
@@ -1249,23 +1399,18 @@
             base.banners = Array.isArray(base.banners) ? base.banners : defaultFallbackData.banners;
             base.sellers = Array.isArray(base.sellers) ? base.sellers : defaultFallbackData.sellers;
             base.coupon = base.coupon || defaultFallbackData.coupon;
+            base.secondaryBanner = base.secondaryBanner || defaultFallbackData.secondaryBanner;
             base.links = legacyLinks;
             base.socialLinks = legacySocialLinks.filter(Boolean);
             base.footerText = base.footerText || defaultFallbackData.footerText;
             return base;
         }
 
-        // Função de Resgatar Cupom Integrada com Toast Nativo
         function resgatarCupom(code) {
-            // Tenta copiar para a área de transferência
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(code).catch(() => {});
             }
-            
-            // Dispara o Toast elegante
             showToast("Cupom resgatado! Escolha um vendedor abaixo.");
-            
-            // Rola até a seção de vendedores de forma suave
             const sellerSection = document.querySelector('.sellers-section');
             if (sellerSection) {
                 sellerSection.scrollIntoView({ behavior: 'smooth' });
@@ -1336,26 +1481,64 @@
                 `;
             }
 
+            // Renderizar Banner Promocional Secundário
+            const secondaryBannerContainer = document.getElementById('secondary-banner-container');
+            secondaryBannerContainer.innerHTML = '';
+            if (appData.secondaryBanner && appData.secondaryBanner.imageUrl) {
+                const bannerHref = appData.secondaryBanner.linkUrl ? `href="${appData.secondaryBanner.linkUrl}" target="_blank"` : 'href="javascript:void(0)"';
+                secondaryBannerContainer.innerHTML = `
+                    <a ${bannerHref} class="secondary-promo-banner">
+                        <img src="${appData.secondaryBanner.imageUrl}" alt="Promoção">
+                    </a>
+                `;
+            }
+
+            // Separação em Online e Offline com Sorteio Aleatório mantendo Online no topo
             const sellersGrid = document.getElementById('sellers-grid');
             sellersGrid.innerHTML = ''; 
-            const randomSellers = shuffleArray([...(appData.sellers || [])]);
-            randomSellers.forEach(seller => {
-                let linkWA = `https://wa.me/${seller.whatsapp}`;
-                // Adicionar cupom na mensagem se estiver ativado
-                if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
-                    const couponMsg = `Olá, vi seu cupom: *${appData.coupon.code}*`;
-                    linkWA += `?text=${encodeURIComponent(couponMsg)}`;
+
+            const allSellers = appData.sellers || [];
+            const onlineSellers = [];
+            const offlineSellers = [];
+
+            allSellers.forEach(seller => {
+                if (isSellerOnline(seller)) {
+                    onlineSellers.push(seller);
+                } else {
+                    offlineSellers.push(seller);
                 }
+            });
+
+            const sortedSellers = [...shuffleArray(onlineSellers), ...shuffleArray(offlineSellers)];
+
+            sortedSellers.forEach(seller => {
+                const isOnline = isSellerOnline(seller);
+                let linkWA = `https://wa.me/${seller.whatsapp}`;
+                
+                // Mensagem personalizada sempre com o nome do vendedor
+                let defaultMsg = `Olá, ${seller.name}! Vim através do site e gostaria de atendimento.`;
+                if (appData.coupon && appData.coupon.enabled && appData.coupon.code) {
+                    defaultMsg = `Olá, ${seller.name}! Vim pelo site e quero usar o cupom: *${appData.coupon.code}*`;
+                }
+                linkWA += `?text=${encodeURIComponent(defaultMsg)}`;
+
                 const photoSrc = seller.photoUrl || 'https://via.placeholder.com/80';
+                
                 sellersGrid.innerHTML += `
                     <div class="seller-card">
+                        <div class="seller-status-badge ${isOnline ? 'online' : 'offline'}">
+                            <span class="status-dot-indicator ${isOnline ? 'online' : 'offline'}"></span>
+                            ${isOnline ? 'Online' : 'Offline'}
+                        </div>
                         <div class="seller-photo-container">
                             <img src="${photoSrc}" alt="${seller.name}" class="seller-photo">
                             <div class="seller-whatsapp-badge"><i class="fab fa-whatsapp"></i></div>
                         </div>
                         <h3 class="seller-name">${seller.name}</h3>
                         <p class="seller-role">${seller.role}</p>
-                        <a href="${linkWA}" target="_blank" class="btn-whatsapp">Chamar</a>
+                        <a href="${linkWA}" target="_blank" class="btn-whatsapp ${!isOnline ? 'btn-offline' : ''}">
+                            ${isOnline ? 'Chamar no WhatsApp' : 'Deixar Mensagem'}
+                        </a>
                     </div>
                 `;
             });
@@ -1452,6 +1635,11 @@
             document.getElementById('coupon-enabled').checked = (appData.coupon && appData.coupon.enabled) || false;
             document.getElementById('input-coupon-text').value = (appData.coupon && appData.coupon.text) || '';
             document.getElementById('input-coupon-code').value = (appData.coupon && appData.coupon.code) || '';
+            
+            // Banner Secundário Admin
+            document.getElementById('secondary-banner-img-url').value = (appData.secondaryBanner && appData.secondaryBanner.imageUrl) || '';
+            document.getElementById('secondary-banner-target-url').value = (appData.secondaryBanner && appData.secondaryBanner.linkUrl) || '';
+
             document.getElementById('input-footer-text').value = appData.footerText;
 
             const bannersList = document.getElementById('admin-banners-list');
@@ -1473,9 +1661,15 @@
             const adminSellersList = document.getElementById('admin-sellers-list');
             adminSellersList.innerHTML = '';
             (appData.sellers || []).forEach(seller => {
+                const intervalText = seller.intervals && seller.intervals.length 
+                    ? seller.intervals.map(i => `${i.start}-${i.end}`).join(', ') 
+                    : '24 Horas';
                 adminSellersList.innerHTML += `
                     <div class="admin-item-list">
-                        <div><strong>${seller.name}</strong> <small>(${seller.whatsapp})</small></div>
+                        <div>
+                            <strong>${seller.name}</strong> <small>(${seller.whatsapp})</small>
+                            <div style="font-size:11px; color:#666; margin-top:2px;">Turnos: ${intervalText}</div>
+                        </div>
                         <div class="admin-actions">
                             <button class="btn-action" onclick="editSeller(${seller.id})"><i class="fas fa-edit"></i></button>
                             <button class="btn-delete" onclick="deleteSeller(${seller.id})"><i class="fas fa-trash"></i></button>
