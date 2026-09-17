@@ -484,7 +484,7 @@
             <div class="admin-section">
                 <h3><i class="fas fa-image"></i> Banner Promocional Secundário (Abaixo do Cupom)</h3>
                 <p style="font-size:12px; color:#777; margin-bottom:12px;">Se não cadastrar imagem, o banner ficará oculto automaticamente.</p>
-                <div class="form-group"><label>Upload Imagem do Banner:</label><input type="file" id="secondary-banner-file" accept="image/*"></div>
+                <div class="form-group"><label>Upload Imagem do Banner:</label><input type="file" id="secondary-banner-file" accept="image/*"><small class="image-hint">Tamanho ideal: 1200x600 px (proporção 2:1).</small></div>
                 <div class="upload-or">OU</div>
                 <div class="form-group"><label>URL da Imagem:</label><input type="text" id="secondary-banner-img-url" placeholder="https://..."><small class="image-hint">Tamanho ideal: 1200x600 px (proporção 2:1).</small></div>
                 <div class="form-group"><label>Link de Destino (Clique):</label><input type="text" id="secondary-banner-target-url" placeholder="https://exemplo.com.br/promocao"></div>
@@ -510,7 +510,7 @@
                 <input type="hidden" id="edit-link-id" value="">
                 <div class="form-group"><label>Título:</label><input type="text" id="new-link-title"></div>
                 <div class="form-group"><label>URL:</label><input type="text" id="new-link-url"></div>
-                <div class="form-group"><label>Imagem (opcional):</label><input type="file" id="new-link-file" accept="image/*"></div>
+                <div class="form-group"><label>Imagem (opcional):</label><input type="file" id="new-link-file" accept="image/*"><small class="image-hint">Tamanho ideal: 1200x600 px (proporção 2:1).</small></div>
                 <button class="btn-add" id="btn-link-action" onclick="saveLink()">+ Adicionar Link</button>
             </div>
 
@@ -803,6 +803,16 @@
             renderSellerIntervalsUI();
         }
 
+        function isAdminOpen() {
+            return document.getElementById('admin-view').style.display === 'block';
+        }
+
+        function showPublicViewIfNeeded() {
+            if (!isAdminOpen()) {
+                document.getElementById('public-view').style.display = 'flex';
+            }
+        }
+
         async function fetchAppData({ forceRemote = false } = {}) {
             try {
                 if (!initSupabaseClient()) {
@@ -820,7 +830,7 @@
                     applyColors();
                     renderPublicView();
                     hideLoading();
-                    document.getElementById('public-view').style.display = 'flex';
+                    showPublicViewIfNeeded();
                     localStorage.removeItem(STORAGE_KEYS.forceRefresh);
                     return;
                 }
@@ -829,7 +839,7 @@
                     appData = JSON.parse(cachedData);
                     applyColors();
                     renderPublicView();
-                    document.getElementById('public-view').style.display = 'flex';
+                    showPublicViewIfNeeded();
                 }
 
                 const { data, error } = await supabaseClient
@@ -852,7 +862,7 @@
                 applyColors();
                 renderPublicView();
                 hideLoading();
-                document.getElementById('public-view').style.display = 'flex';
+                showPublicViewIfNeeded();
 
             } catch (error) {
                 const fallbackCache = localStorage.getItem(STORAGE_KEYS.cache);
@@ -860,7 +870,7 @@
                 applyColors();
                 renderPublicView();
                 hideLoading();
-                document.getElementById('public-view').style.display = 'flex';
+                showPublicViewIfNeeded();
                 showToast("Modo offline ativado.");
             }
         }
