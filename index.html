@@ -134,6 +134,7 @@
             text-transform: uppercase; letter-spacing: 0.5px;
         }
         .seller-status-badge.online { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .seller-status-badge.lunch { background-color: #fef3c7; color: #a16207; border: 1px solid #fde68a; }
         .seller-status-badge.offline { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
         .status-dot-indicator { width: 6px; height: 6px; border-radius: 50%; }
         .status-dot-indicator.online { background-color: #22c55e; box-shadow: 0 0 5px #22c55e; }
@@ -150,6 +151,9 @@
         .extra-links-section { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
         .link-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
         .link-btn:hover { background-color: var(--primary-color); color: white; }
+        .link-btn.with-image { padding: 0; overflow: hidden; flex-direction: column; }
+        .link-btn-image { width: 100%; aspect-ratio: 2 / 1; object-fit: cover; display: block; }
+        .link-btn-title { padding: 10px 12px; width: 100%; text-align: center; }
 
         footer { margin-top: auto; padding: 20px; text-align: center; font-size: 12px; color: var(--text-light); background-color: rgba(0,0,0,0.02); }
 
@@ -161,16 +165,26 @@
         .login-box { margin-top: 100px; text-align: center; }
         .login-box h2 { margin-bottom: 20px; color: #111; }
         .login-box input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; margin-bottom: 15px;}
+        .password-field { position: relative; margin-bottom: 15px; }
+        .password-field input { margin-bottom: 0; padding-right: 44px; }
+        .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; cursor: pointer; padding: 6px; }
         .btn-login { background-color: var(--primary-color); color: white; padding: 12px; width: 100%; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px;}
         .btn-cancel { background: none; border: none; color: #888; margin-top: 15px; cursor: pointer; text-decoration: underline; }
 
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .admin-header { position: sticky; top: -20px; z-index: 5; display: flex; justify-content: space-between; align-items: center; margin: -20px -20px 20px; padding: 16px 20px 12px; background: rgba(255,255,255,0.96); border-bottom: 1px solid #eee; backdrop-filter: blur(8px); }
         .btn-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #333; }
-        .admin-section { margin-bottom: 25px; background: #f9fafb; padding: 15px; border-radius: 10px; border: 1px solid #e5e7eb; }
-        .admin-section h3 { font-size: 16px; margin-bottom: 15px; color: #111; display: flex; align-items: center; gap: 8px; }
+        .admin-section { margin-bottom: 25px; background: #f9fafb; padding: 15px; border-radius: 10px; border: 1px solid #e5e7eb; transition: box-shadow 0.2s ease, border-color 0.2s ease; }
+        .admin-section.collapsed { padding-bottom: 10px; }
+        .admin-section h3 { font-size: 16px; margin: -2px 0 15px; padding: 2px 0; color: #111; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+        .admin-section h3::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; margin-left: auto; color: #9ca3af; font-size: 12px; transition: transform 0.2s ease; }
+        .admin-section.collapsed h3 { margin-bottom: 0; }
+        .admin-section.collapsed h3::after { transform: rotate(-90deg); }
+        .admin-section.collapsed > :not(h3) { display: none; }
+        .admin-section:not(.collapsed):focus-within { border-color: #cbd5e1; box-shadow: 0 6px 18px rgba(15,23,42,0.06); }
+        .image-hint { display: block; margin-top: 4px; color: #6b7280; font-size: 11px; line-height: 1.35; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: 600; color: #555; }
-        .form-group input[type="text"], .form-group input[type="file"], .form-group input[type="time"], .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: white; font-family: 'Poppins', sans-serif;}
+        .form-group input[type="text"], .form-group input[type="file"], .form-group input[type="time"], .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: white; font-family: 'Poppins', sans-serif;}
         
         .color-row { display: flex; gap: 10px; align-items: center; }
         .color-preview { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #ccc; flex-shrink: 0; }
@@ -189,6 +203,11 @@
         .interval-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
         .interval-row input[type="time"] { padding: 6px 8px; font-size: 13px; }
         .btn-remove-interval { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; border-radius: 4px; padding: 6px 10px; cursor: pointer; }
+        .schedule-day { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 9px; margin-bottom: 8px; }
+        .schedule-day-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+        .schedule-day-header input { width: 18px; height: 18px; }
+        .schedule-day-intervals { margin: 8px 0 0 26px; }
+        .schedule-day-intervals .interval-row:last-child { margin-bottom: 0; }
 
         #seller-crop-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -326,9 +345,11 @@
         <div id="login-view">
             <div class="login-box">
                 <h2>🔐 Acesso Restrito</h2>
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Acesse com sua conta do Supabase</p>
                 <input type="email" id="admin-email" placeholder="Seu E-mail">
-                <input type="password" id="admin-password" placeholder="Sua Senha">
+                <div class="password-field">
+                    <input type="password" id="admin-password" placeholder="Sua Senha">
+                    <button type="button" class="toggle-password" id="toggle-password" onclick="togglePasswordVisibility()" aria-label="Mostrar senha" title="Mostrar senha"><i class="fas fa-eye"></i></button>
+                </div>
                 <button class="btn-login" id="btn-login" onclick="attemptLogin()">Entrar</button>
                 <button class="btn-cancel" onclick="closeLogin()">Cancelar</button>
             </div>
@@ -390,13 +411,13 @@
                 
                 <div class="form-group"><label>Arquivo da Logo:</label><input type="file" id="new-logo-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
-                <div class="form-group"><label>URL da Logo:</label><input type="text" id="input-store-logo"></div>
+                <div class="form-group"><label>URL da Logo:</label><input type="text" id="input-store-logo"><small class="image-hint">Use uma imagem quadrada próxima de 400x400 px.</small></div>
                 
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 
                 <div class="form-group"><label>Favicon da Aba (Arquivo):</label><input type="file" id="new-favicon-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
-                <div class="form-group"><label>URL do Favicon:</label><input type="text" id="input-store-favicon" placeholder="http://..."></div>
+                <div class="form-group"><label>URL do Favicon:</label><input type="text" id="input-store-favicon" placeholder="http://..."><small class="image-hint">Tamanho ideal: 64x64 px (imagem quadrada).</small></div>
 
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
 
@@ -411,7 +432,7 @@
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <div class="form-group"><label>Arquivo do Banner (1200x600):</label><input type="file" id="new-banner-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
-                <div class="form-group"><label>Colar URL da imagem:</label><input type="text" id="new-banner-url" placeholder="http://..."></div>
+                <div class="form-group"><label>Colar URL da imagem:</label><input type="text" id="new-banner-url" placeholder="http://..."><small class="image-hint">Tamanho ideal: 1200x600 px (proporção 2:1).</small></div>
                 <button class="btn-add" onclick="addBanner()">+ Adicionar Banner</button>
             </div>
 
@@ -421,15 +442,19 @@
                 <hr style="margin: 15px 0; border-top: 1px dashed #ccc;">
                 <input type="hidden" id="edit-seller-id" value="">
                 <div class="form-group"><label>Nome:</label><input type="text" id="new-seller-name"></div>
-                <div class="form-group"><label>Cargo:</label><input type="text" id="new-seller-role" value="Vendedor"></div>
+                <div class="form-group"><label>Cargo:</label><select id="new-seller-role">
+                    <option value="Vendedora">Vendedora</option>
+                    <option value="Vendedor" selected>Vendedor</option>
+                    <option value="Gerente">Gerente</option>
+                    <option value="Caixa">Caixa</option>
+                </select></div>
                 <div class="form-group"><label>WhatsApp (só números):</label><input type="text" id="new-seller-wa" placeholder="5511999999999"></div>
                 
                 <!-- Horários e Intervalos do Vendedor -->
                 <div class="form-group">
                     <label>⏰ Horários em que estará Online (Intervalos):</label>
-                    <p style="font-size: 11px; color: #777; margin-bottom: 6px;">Adicione um ou mais turnos. Se vazio, ficará online 24h.</p>
+                    <p style="font-size: 11px; color: #777; margin-bottom: 6px;">Marque os dias e adicione os turnos de cada dia. Dias sem horário ficam offline.</p>
                     <div id="seller-intervals-container"></div>
-                    <button type="button" class="btn-action" style="background:#4b5563; font-size:12px; margin-top:4px;" onclick="addSellerIntervalRow()">+ Adicionar Intervalo de Horário</button>
                 </div>
 
                 <div class="form-group" style="margin-top: 10px;"><label>Foto (Arquivo):</label><input type="file" id="new-seller-file" accept="image/*" onchange="if (this.files && this.files[0]) openSellerCrop(this.files[0]);"></div>
@@ -461,7 +486,7 @@
                 <p style="font-size:12px; color:#777; margin-bottom:12px;">Se não cadastrar imagem, o banner ficará oculto automaticamente.</p>
                 <div class="form-group"><label>Upload Imagem do Banner:</label><input type="file" id="secondary-banner-file" accept="image/*"></div>
                 <div class="upload-or">OU</div>
-                <div class="form-group"><label>URL da Imagem:</label><input type="text" id="secondary-banner-img-url" placeholder="https://..."></div>
+                <div class="form-group"><label>URL da Imagem:</label><input type="text" id="secondary-banner-img-url" placeholder="https://..."><small class="image-hint">Tamanho ideal: 1200x600 px (proporção 2:1).</small></div>
                 <div class="form-group"><label>Link de Destino (Clique):</label><input type="text" id="secondary-banner-target-url" placeholder="https://exemplo.com.br/promocao"></div>
                 <button class="btn-save" onclick="saveSecondaryBanner()">Salvar Banner Promocional</button>
             </div>
@@ -485,6 +510,7 @@
                 <input type="hidden" id="edit-link-id" value="">
                 <div class="form-group"><label>Título:</label><input type="text" id="new-link-title"></div>
                 <div class="form-group"><label>URL:</label><input type="text" id="new-link-url"></div>
+                <div class="form-group"><label>Imagem (opcional):</label><input type="file" id="new-link-file" accept="image/*"></div>
                 <button class="btn-add" id="btn-link-action" onclick="saveLink()">+ Adicionar Link</button>
             </div>
 
@@ -542,7 +568,15 @@
         let modalCallback = null;
         let sellerCropState = { file: null, imageUrl: '', zoom: 1, offsetX: 0, offsetY: 0 };
         let sellerPendingCropFile = null;
-        let currentSellerIntervals = [];
+        let sellerDisplayOrderIds = null;
+        let sellerDisplaySignature = '';
+        const WEEK_DAYS = [
+            { value: 0, label: 'Domingo' }, { value: 1, label: 'Segunda-feira' },
+            { value: 2, label: 'Terça-feira' }, { value: 3, label: 'Quarta-feira' },
+            { value: 4, label: 'Quinta-feira' }, { value: 5, label: 'Sexta-feira' },
+            { value: 6, label: 'Sábado' }
+        ];
+        let currentSellerSchedule = {};
 
         const defaultFallbackData = {
             colors: { primary: "#16a34a", header: "#111111" },
@@ -565,7 +599,7 @@
                 { id: 2, platform: "facebook", url: "https://facebook.com/centersport" },
                 { id: 3, platform: "youtube", url: "https://youtube.com/@centersport" }
             ],
-            links: [{ id: 1, title: "🌐 Acesse nosso Site", url: "#" }],
+            links: [{ id: 1, title: "🌐 Acesse nosso Site", url: "#", imageUrl: "" }],
             footerText: "© 2026 Center Sport - Todos os direitos reservados"
         };
 
@@ -660,27 +694,113 @@
             }
         }
 
-        function isSellerOnline(seller) {
-            if (!seller.intervals || !Array.isArray(seller.intervals) || seller.intervals.length === 0) {
-                return true;
+        function getSellerStatus(seller, now = new Date()) {
+            const dayIntervals = (seller.schedule && seller.schedule[now.getDay()]) || [];
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const validIntervals = dayIntervals
+                .filter(interval => interval && interval.start && interval.end)
+                .map(interval => ({
+                    start: interval.start,
+                    end: interval.end,
+                    startMin: Number(interval.start.split(':')[0]) * 60 + Number(interval.start.split(':')[1]),
+                    endMin: Number(interval.end.split(':')[0]) * 60 + Number(interval.end.split(':')[1])
+                }))
+                .filter(interval => interval.endMin > interval.startMin)
+                .sort((first, second) => first.startMin - second.startMin);
+
+            if (validIntervals.some(interval => currentMinutes >= interval.startMin && currentMinutes < interval.endMin)) {
+                return { state: 'online', label: 'Online' };
             }
 
-            const now = new Date();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-            return seller.intervals.some(interval => {
-                if (!interval.start || !interval.end) return false;
-                const [startH, startM] = interval.start.split(':').map(Number);
-                const [endH, endM] = interval.end.split(':').map(Number);
-                const startMin = startH * 60 + startM;
-                const endMin = endH * 60 + endM;
-
-                if (startMin <= endMin) {
-                    return currentMinutes >= startMin && currentMinutes <= endMin;
-                } else {
-                    return currentMinutes >= startMin || currentMinutes <= endMin;
+            for (let index = 0; index < validIntervals.length - 1; index++) {
+                const pauseMinutes = validIntervals[index + 1].startMin - validIntervals[index].endMin;
+                if (pauseMinutes > 0 && (pauseMinutes === 60 || validIntervals.length > 1)) {
+                    if (currentMinutes >= validIntervals[index].endMin && currentMinutes < validIntervals[index + 1].startMin) {
+                        return { state: 'lunch', label: 'Horário de almoço' };
+                    }
                 }
-            });
+            }
+
+            return { state: 'offline', label: 'Offline' };
+        }
+
+        function isSellerOnline(seller) {
+            return getSellerStatus(seller).state === 'online';
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('admin-password');
+            const toggleButton = document.getElementById('toggle-password');
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleButton.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+            toggleButton.setAttribute('title', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+            toggleButton.innerHTML = `<i class="fas fa-eye${isPassword ? '-slash' : ''}"></i>`;
+        }
+
+        /* Mantém dados antigos compatíveis e converte intervalos globais para todos os dias. */
+        function normalizeSellerSchedule(seller) {
+            if (seller.schedule && typeof seller.schedule === 'object' && !Array.isArray(seller.schedule)) {
+                return seller.schedule;
+            }
+            const legacyIntervals = Array.isArray(seller.intervals) && seller.intervals.length
+                ? seller.intervals
+                : [{ start: '00:00', end: '23:59' }];
+            return WEEK_DAYS.reduce((schedule, day) => {
+                schedule[day.value] = JSON.parse(JSON.stringify(legacyIntervals));
+                return schedule;
+            }, {});
+        }
+
+        function getSellerIntervals(seller) {
+            const day = new Date().getDay();
+            return (seller.schedule && seller.schedule[day]) || [];
+        }
+
+        function updateScheduleInterval(day, index, field, value) {
+            if (!currentSellerSchedule[day]) currentSellerSchedule[day] = [];
+            currentSellerSchedule[day][index][field] = value;
+        }
+
+        function renderSellerIntervalsUI() {
+            const container = document.getElementById('seller-intervals-container');
+            if (!container) return;
+            container.innerHTML = WEEK_DAYS.map(day => {
+                const intervals = currentSellerSchedule[day.value] || [];
+                return `
+                    <div class="schedule-day">
+                        <label class="schedule-day-header">
+                            <input type="checkbox" ${intervals.length ? 'checked' : ''} onchange="toggleSellerDay(${day.value}, this.checked)">
+                            ${day.label}
+                        </label>
+                        <div class="schedule-day-intervals">
+                            ${intervals.map((interval, index) => `
+                                <div class="interval-row">
+                                    <input type="time" value="${interval.start || ''}" onchange="updateScheduleInterval(${day.value}, ${index}, 'start', this.value)">
+                                    <span style="font-size:12px; color:#666;">até</span>
+                                    <input type="time" value="${interval.end || ''}" onchange="updateScheduleInterval(${day.value}, ${index}, 'end', this.value)">
+                                    <button type="button" class="btn-remove-interval" onclick="removeSellerIntervalRow(${day.value}, ${index})"><i class="fas fa-trash"></i></button>
+                                </div>`).join('')}
+                            <button type="button" class="btn-action" style="background:#4b5563; font-size:12px; margin-top:4px;" onclick="addSellerIntervalRow(${day.value})">+ Intervalo</button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function toggleSellerDay(day, enabled) {
+            currentSellerSchedule[day] = enabled ? [{ start: '08:00', end: '12:00' }] : [];
+            renderSellerIntervalsUI();
+        }
+
+        function addSellerIntervalRow(day) {
+            if (!currentSellerSchedule[day]) currentSellerSchedule[day] = [];
+            currentSellerSchedule[day].push({ start: '13:00', end: '18:00' });
+            renderSellerIntervalsUI();
+        }
+
+        function removeSellerIntervalRow(day, index) {
+            currentSellerSchedule[day].splice(index, 1);
+            renderSellerIntervalsUI();
         }
 
         async function fetchAppData({ forceRemote = false } = {}) {
@@ -825,6 +945,20 @@
 
             const { data: publicData } = supabaseClient.storage.from('linktree_uploads').getPublicUrl(filePath);
             return publicData.publicUrl;
+        }
+
+        async function deleteImageByUrl(imageUrl) {
+            if (!imageUrl || !supabaseClient) return;
+            try {
+                const marker = '/storage/v1/object/public/linktree_uploads/';
+                const markerIndex = imageUrl.indexOf(marker);
+                if (markerIndex === -1) return;
+                const filePath = decodeURIComponent(imageUrl.slice(markerIndex + marker.length));
+                const { error } = await supabaseClient.storage.from('linktree_uploads').remove([filePath]);
+                if (error) console.error('Erro ao excluir imagem antiga:', error);
+            } catch (error) {
+                console.error('Erro ao localizar imagem antiga:', error);
+            }
         }
 
         async function resizeImageToStandard(file) {
@@ -1050,34 +1184,6 @@
             image.src = sellerCropState.imageUrl;
         }
 
-        function renderSellerIntervalsUI() {
-            const container = document.getElementById('seller-intervals-container');
-            if (!container) return;
-            container.innerHTML = '';
-            
-            currentSellerIntervals.forEach((interval, idx) => {
-                const row = document.createElement('div');
-                row.className = 'interval-row';
-                row.innerHTML = `
-                    <input type="time" value="${interval.start || ''}" onchange="currentSellerIntervals[${idx}].start = this.value">
-                    <span style="font-size:12px; color:#666;">até</span>
-                    <input type="time" value="${interval.end || ''}" onchange="currentSellerIntervals[${idx}].end = this.value">
-                    <button type="button" class="btn-remove-interval" onclick="removeSellerIntervalRow(${idx})"><i class="fas fa-trash"></i></button>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function addSellerIntervalRow() {
-            currentSellerIntervals.push({ start: "08:00", end: "18:00" });
-            renderSellerIntervalsUI();
-        }
-
-        function removeSellerIntervalRow(idx) {
-            currentSellerIntervals.splice(idx, 1);
-            renderSellerIntervalsUI();
-        }
-
         async function saveSeller() {
             const id = document.getElementById('edit-seller-id').value;
             const name = document.getElementById('new-seller-name').value;
@@ -1097,7 +1203,8 @@
                 hideLoading();
             }
 
-            const cleanIntervals = currentSellerIntervals.filter(i => i.start && i.end);
+            const cleanSchedule = Object.fromEntries(Object.entries(currentSellerSchedule)
+                .map(([day, intervals]) => [day, intervals.filter(interval => interval.start && interval.end)]));
 
             if (id) {
                 const seller = appData.sellers.find(s => s.id == id);
@@ -1105,7 +1212,7 @@
                     seller.name = name;
                     seller.role = role;
                     seller.whatsapp = wa.replace(/\D/g, '');
-                    seller.intervals = cleanIntervals;
+                    seller.schedule = cleanSchedule;
                     if (photoUrl) seller.photoUrl = photoUrl;
                 }
                 showToast("Vendedor atualizado!");
@@ -1117,7 +1224,7 @@
                     role: role || 'Vendedor',
                     whatsapp: wa.replace(/\D/g, ''),
                     photoUrl: photoUrl,
-                    intervals: cleanIntervals
+                    schedule: cleanSchedule
                 });
                 showToast("Vendedor adicionado!");
             }
@@ -1136,7 +1243,7 @@
             document.getElementById('new-seller-photo').value = '';
             document.getElementById('btn-seller-action').innerText = "+ Adicionar Vendedor";
             sellerPendingCropFile = null;
-            currentSellerIntervals = [];
+            currentSellerSchedule = {};
             renderSellerIntervalsUI();
         }
 
@@ -1145,10 +1252,10 @@
             if (!s) return;
             document.getElementById('edit-seller-id').value = s.id;
             document.getElementById('new-seller-name').value = s.name;
-            document.getElementById('new-seller-role').value = s.role;
+            document.getElementById('new-seller-role').value = ['Vendedora', 'Vendedor', 'Gerente', 'Caixa'].includes(s.role) ? s.role : 'Vendedor';
             document.getElementById('new-seller-wa').value = s.whatsapp;
             document.getElementById('new-seller-photo').value = s.photoUrl || '';
-            currentSellerIntervals = (s.intervals && Array.isArray(s.intervals)) ? JSON.parse(JSON.stringify(s.intervals)) : [];
+            currentSellerSchedule = JSON.parse(JSON.stringify(normalizeSellerSchedule(s)));
             renderSellerIntervalsUI();
             document.getElementById('btn-seller-action').innerText = "💾 Salvar Alterações";
         }
@@ -1272,22 +1379,43 @@
             const id = document.getElementById('edit-link-id').value;
             const title = document.getElementById('new-link-title').value;
             const url = document.getElementById('new-link-url').value;
+            const fileInput = document.getElementById('new-link-file');
+            const selectedFile = fileInput.files[0];
 
             if(!title || !url) return showToast("Título e URL são obrigatórios!");
 
+            let imageUrl = '';
+            const existingLink = id ? appData.links.find(link => link.id == id) : null;
+            if (selectedFile) {
+                showLoading("Enviando imagem do link...");
+                try {
+                    imageUrl = await uploadImage(selectedFile, 'extra_links');
+                } catch (error) {
+                    hideLoading();
+                    return showToast("Erro ao enviar imagem: " + error.message);
+                }
+                hideLoading();
+                if (existingLink && existingLink.imageUrl && existingLink.imageUrl !== imageUrl) {
+                    await deleteImageByUrl(existingLink.imageUrl);
+                }
+            } else if (existingLink) {
+                imageUrl = existingLink.imageUrl || '';
+            }
+
             if (id) {
                 const link = appData.links.find(l => l.id == id);
-                if (link) { link.title = title; link.url = url; }
+                if (link) { link.title = title; link.url = url; link.imageUrl = imageUrl; }
                 showToast("Link atualizado!");
             } else {
                 const newId = appData.links.length > 0 ? Math.max(...appData.links.map(l => l.id)) + 1 : 1;
-                appData.links.push({ id: newId, title: title, url: url });
+                appData.links.push({ id: newId, title: title, url: url, imageUrl });
                 showToast("Link adicionado!");
             }
 
             document.getElementById('edit-link-id').value = '';
             document.getElementById('new-link-title').value = '';
             document.getElementById('new-link-url').value = '';
+            fileInput.value = '';
             document.getElementById('btn-link-action').innerText = "+ Adicionar Link";
             
             renderAdminView();
@@ -1300,6 +1428,7 @@
             document.getElementById('edit-link-id').value = l.id;
             document.getElementById('new-link-title').value = l.title;
             document.getElementById('new-link-url').value = l.url;
+            document.getElementById('new-link-file').value = '';
             document.getElementById('btn-link-action').innerText = "💾 Salvar Alterações";
         }
 
@@ -1315,7 +1444,9 @@
         function deleteLink(id) {
             showConfirm("Excluir Link", "Deseja remover este botão?", (res) => {
                 if (res) { 
+                    const link = appData.links.find(item => item.id === id);
                     appData.links = appData.links.filter(l => l.id !== id);
+                    if (link && link.imageUrl) deleteImageByUrl(link.imageUrl);
                     renderAdminView();
                     saveToSupabase(false);
                     showToast("Link removido.");
@@ -1431,9 +1562,12 @@
             base.store = { ...defaultFallbackData.store, ...(base.store || {}) };
             base.banners = Array.isArray(base.banners) ? base.banners : defaultFallbackData.banners;
             base.sellers = Array.isArray(base.sellers) ? base.sellers : defaultFallbackData.sellers;
+            base.sellers.forEach(seller => {
+                seller.schedule = normalizeSellerSchedule(seller);
+            });
             base.coupon = base.coupon || defaultFallbackData.coupon;
             base.secondaryBanner = base.secondaryBanner || defaultFallbackData.secondaryBanner;
-            base.links = legacyLinks;
+            base.links = legacyLinks.map(link => ({ ...link, imageUrl: link.imageUrl || '' }));
             base.socialLinks = legacySocialLinks.filter(Boolean);
             base.footerText = base.footerText || defaultFallbackData.footerText;
             return base;
@@ -1562,21 +1696,40 @@
             sellersGrid.innerHTML = ''; 
 
             const allSellers = appData.sellers || [];
+            const currentSellerSignature = JSON.stringify(allSellers.map(seller => ({ id: seller.id, name: seller.name, role: seller.role, whatsapp: seller.whatsapp })));
+            if (currentSellerSignature !== sellerDisplaySignature) {
+                sellerDisplaySignature = currentSellerSignature;
+                sellerDisplayOrderIds = null;
+            }
             const onlineSellers = [];
             const offlineSellers = [];
 
             allSellers.forEach(seller => {
-                if (isSellerOnline(seller)) {
+                if (getSellerStatus(seller).state === 'online') {
                     onlineSellers.push(seller);
                 } else {
                     offlineSellers.push(seller);
                 }
             });
 
-            const sortedSellers = [...shuffleArray(onlineSellers), ...shuffleArray(offlineSellers)];
+            if (!sellerDisplayOrderIds || sellerDisplayOrderIds.length !== allSellers.length) {
+                const regularSellers = allSellers.filter(seller => !['gerente', 'caixa'].includes(String(seller.role || '').toLowerCase()));
+                const managementSellers = allSellers.filter(seller => ['gerente', 'caixa'].includes(String(seller.role || '').toLowerCase()));
+                const regularOnline = regularSellers.filter(seller => getSellerStatus(seller).state === 'online');
+                const regularOffline = regularSellers.filter(seller => getSellerStatus(seller).state !== 'online');
+                const managementOnline = managementSellers.filter(seller => getSellerStatus(seller).state === 'online');
+                const managementOffline = managementSellers.filter(seller => getSellerStatus(seller).state !== 'online');
+                sellerDisplayOrderIds = [
+                    ...shuffleArray(regularOnline), ...shuffleArray(regularOffline),
+                    ...shuffleArray(managementOnline), ...shuffleArray(managementOffline)
+                ].map(seller => seller.id);
+            }
+            const sellerById = new Map(allSellers.map(seller => [seller.id, seller]));
+            const sortedSellers = sellerDisplayOrderIds.map(id => sellerById.get(id)).filter(Boolean);
 
             sortedSellers.forEach(seller => {
-                const isOnline = isSellerOnline(seller);
+                const sellerStatus = getSellerStatus(seller);
+                const isOnline = sellerStatus.state === 'online';
                 let linkWA = `https://wa.me/${seller.whatsapp}`;
                 
                 let defaultMsg = `Olá, ${seller.name}! Vim através do site e gostaria de atendimento.`;
@@ -1590,9 +1743,9 @@
                 
                 sellersGrid.innerHTML += `
                     <div class="seller-card">
-                        <div class="seller-status-badge ${isOnline ? 'online' : 'offline'}">
-                            <span class="status-dot-indicator ${isOnline ? 'online' : 'offline'}"></span>
-                            ${isOnline ? 'Online' : 'Offline'}
+                        <div class="seller-status-badge ${sellerStatus.state}">
+                            <span class="status-dot-indicator ${sellerStatus.state === 'online' ? 'online' : 'offline'}"></span>
+                            ${sellerStatus.label}
                         </div>
                         <div class="seller-photo-container">
                             <img src="${photoSrc}" alt="${seller.name}" class="seller-photo">
@@ -1610,7 +1763,8 @@
             const linksGrid = document.getElementById('extra-links-grid');
             linksGrid.innerHTML = '';
             (appData.links || []).forEach(link => {
-                linksGrid.innerHTML += `<a href="${link.url}" target="_blank" class="link-btn">${link.title}</a>`;
+                const imageMarkup = link.imageUrl ? `<img src="${link.imageUrl}" alt="${link.title}" class="link-btn-image">` : '';
+                linksGrid.innerHTML += `<a href="${link.url}" target="_blank" class="link-btn${link.imageUrl ? ' with-image' : ''}">${imageMarkup}<span class="link-btn-title">${link.title}</span></a>`;
             });
         }
 
@@ -1725,9 +1879,10 @@
             const adminSellersList = document.getElementById('admin-sellers-list');
             adminSellersList.innerHTML = '';
             (appData.sellers || []).forEach(seller => {
-                const intervalText = seller.intervals && seller.intervals.length 
-                    ? seller.intervals.map(i => `${i.start}-${i.end}`).join(', ') 
-                    : '24 Horas';
+                const intervalText = WEEK_DAYS.map(day => {
+                    const intervals = seller.schedule && seller.schedule[day.value];
+                    return intervals && intervals.length ? `${day.label.slice(0, 3)}: ${intervals.map(i => `${i.start}-${i.end}`).join(', ')}` : null;
+                }).filter(Boolean).join(' | ') || 'Nenhum horário';
                 adminSellersList.innerHTML += `
                     <div class="admin-item-list">
                         <div>
@@ -1771,7 +1926,10 @@
             (appData.links || []).forEach((link, index) => {
                 adminLinksList.innerHTML += `
                     <div class="admin-item-list">
-                        <div><strong>${link.title}</strong></div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            ${link.imageUrl ? `<img src="${link.imageUrl}" alt="${link.title}" style="width:80px; height:40px; object-fit:cover; border-radius:4px;">` : ''}
+                            <div><strong>${link.title}</strong><br><small>${link.url}</small></div>
+                        </div>
                         <div class="admin-actions">
                             ${index > 0 ? `<button class="btn-action" onclick="moveLink(${index}, -1)"><i class="fas fa-arrow-up"></i></button>` : ''}
                             ${index < appData.links.length - 1 ? `<button class="btn-action" onclick="moveLink(${index}, 1)"><i class="fas fa-arrow-down"></i></button>` : ''}
@@ -1779,6 +1937,30 @@
                             <button class="btn-delete" onclick="deleteLink(${link.id})"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
+            });
+        }
+
+        function setupAdminSectionToggles() {
+            document.querySelectorAll('#admin-view .admin-section').forEach(section => {
+                const heading = section.querySelector('h3');
+                if (!heading || heading.dataset.toggleReady === 'true') return;
+                heading.dataset.toggleReady = 'true';
+                section.classList.add('collapsed');
+                heading.setAttribute('role', 'button');
+                heading.setAttribute('tabindex', '0');
+                heading.setAttribute('aria-expanded', 'false');
+
+                const toggle = () => {
+                    const isCollapsed = section.classList.toggle('collapsed');
+                    heading.setAttribute('aria-expanded', String(!isCollapsed));
+                };
+                heading.addEventListener('click', toggle);
+                heading.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        toggle();
+                    }
+                });
             });
         }
 
@@ -1811,6 +1993,7 @@
         }
 
         setupAutoRefresh();
+        setupAdminSectionToggles();
         setupSellerCropInteractions();
         window.onload = () => fetchAppData({ forceRemote: false });
     </script>
