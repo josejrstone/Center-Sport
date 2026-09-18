@@ -24,16 +24,24 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
+        /* AJUSTE PARA O NAVEGADOR DO INSTAGRAM */
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
         body {
             background-color: #e5e7eb;
-            display: flex;
-            justify-content: center;
             min-height: 100vh;
         }
 
         .app-container {
             width: 100%;
             max-width: 480px;
+            margin: 0 auto; /* Centraliza o contêiner de forma segura */
             background-color: var(--app-bg);
             min-height: 100vh;
             position: relative;
@@ -41,6 +49,7 @@
             display: flex;
             flex-direction: column;
         }
+        /* FIM DO AJUSTE */
 
         #custom-toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
