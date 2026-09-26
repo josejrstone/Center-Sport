@@ -28,11 +28,12 @@
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
-            font-family: 'Poppins', sans-serif; 
+            /* A fonte foi removida daqui para não quebrar os ícones do FontAwesome */
             word-wrap: break-word; /* Força textos muito longos a quebrarem */
         }
 
         html, body {
+            font-family: 'Poppins', sans-serif; /* A fonte deve ficar aqui no body */
             width: 100%;
             max-width: 100%;
             margin: 0;
@@ -43,7 +44,6 @@
         }
 
         body {
-            /* Removido o display:flex daqui para evitar bugs de cálculo de largura no Instagram WebView */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -55,7 +55,7 @@
         .app-container {
             width: 100%;
             max-width: 500px;
-            margin: 0 auto; /* Essa é a forma mais segura de centralizar sem usar flex no body */
+            margin: 0 auto; 
             background-color: var(--app-bg);
             min-height: 100vh;
             min-height: 100dvh;
